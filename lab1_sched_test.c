@@ -36,19 +36,11 @@
 int main(int argc, char *argv[]){
 	Queue q;
 	qInit(&q);
-	qPush(&q, 20);
-	qPush(&q, 12);
-	qPush(&q, 15);
-	int i=0;
-	qData temp;
-	while((temp=qPop(&q))!=-1)
-		printf("%d ",temp);
+	qData taskArr[]={{'A', 0, 3},{'B', 0, 6},{'C',0,4},{'D',0,5},{'E',0,2}};
+	printf("%c, %d\n",taskArr[2].name, taskArr[2].arrivalTime);
+	SJF(taskArr, 5);
 	puts("");
-	qPush(&q, 44);
-	qPush(&q, 2);
-	while((temp=qPop(&q))!=-1)
-		printf("%d ",temp);;
-	puts("");
+	
 	return 0;
 }
 

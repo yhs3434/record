@@ -21,7 +21,11 @@
 #define TRUE 1
 #define FALSE 0
 
-typedef int qData;
+typedef struct _data{
+    char name;
+    int arrivalTime;
+    int serviceTime;
+}qData;
 
 typedef struct _node{
 	qData data;
@@ -39,6 +43,9 @@ typedef struct _queue
 void qInit(Queue *q);
 void qPush(Queue *q, qData data);
 qData qPop(Queue *q);
+void SJF(qData task[], int numOfTask);
+qData qNull();
+int checkNull(qData x);
 
 #endif /* LAB1_HEADER_H*/
 
