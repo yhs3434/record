@@ -37,7 +37,7 @@ int main(int argc, char *argv[]){
 	Queue q;
 	qInit(&q);
 	qData taskArr[]={{'A', 0, 3},{'B', 0, 6},{'C',0,4},{'D',0,5},{'E',0,2}};
-	printf("%c, %d\n",taskArr[2].name, taskArr[2].arrivalTime);
+	
 	SJF(taskArr, 5);
 	puts("");
 	
