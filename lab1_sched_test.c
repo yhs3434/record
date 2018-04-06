@@ -34,9 +34,9 @@
  */
 
 int main(int argc, char *argv[]){
-	Queue q;
+    	Queue q;
 	qInit(&q);
-	qData taskArr[]={{'A', 0, 3},{'B', 0, 6},{'C',0,4},{'D',0,5},{'E',0,2}};
+	qData taskArr[]={{'A', 0, 3},{'B', 2, 6},{'C',4,4},{'D',6,5},{'E',8,2}};
 	
 	SJF(taskArr, 5);
 	puts("");

@@ -35,8 +35,14 @@
 void qInit(Queue *q)
 {
     q->numOfData = 0;
-    q->head = NULL;
-    q->tail = NULL;
+    q->head = (Node*)malloc(sizeof(Node));
+    q->tail = (Node*)malloc(sizeof(Node));
+    q->head->prev=NULL;
+    q->head->next=q->tail;
+    q->head->data=qNull();
+    q->tail->prev=q->head;
+    q->tail->next=NULL;
+    q->tail->data=qNull();
 }
 
 void qPush(Queue *q, qData data)
@@ -44,18 +50,10 @@ void qPush(Queue *q, qData data)
     Node *newNode = (Node*)malloc(sizeof(Node));
     newNode->data=data;
 
-    if(!q->numOfData){
-	newNode->prev=NULL;
-	newNode->next=NULL;
-	q->head=q->tail=newNode;
-	q->numOfData++;
-	return;
-    }
-
-    newNode->next=q->head;
-    newNode->prev=NULL;
-    q->head->prev=newNode;
-    q->head=newNode;
+    newNode->prev=q->head;
+    newNode->next=q->head->next;
+    q->head->next->prev=newNode;
+    q->head->next=newNode;
     q->numOfData++;
 
     return;
@@ -67,23 +65,39 @@ qData qPop(Queue *q)
 	printf("Queue is empty\n");
 	return qNull();
     }
-
-    Node *rNode = q->tail;
-    qData rData = q->tail->data;
-
-    if(q->numOfData==1){
-	free(rNode);
-	q->numOfData--;
-	return rData;
-    }
-
-    q->tail->prev->next=NULL;
-    q->tail=q->tail->prev;
+    Node *rNode = q->tail->prev;
+    qData rData = rNode->data;
+    rNode->prev->next=rNode->next;
+    rNode->next->prev=rNode->prev;
     free(rNode);
     q->numOfData--;
 
     return rData;
 }
+
+void sjfPush(Queue *q, qData data)
+{
+    if(!q->numOfData){
+	qPush(q, data);
+	return;
+    }
+
+    Node* ptr = q->tail->prev;
+    for(;ptr!=q->head;ptr=ptr->prev){
+	if(data.serviceTime < ptr->data.serviceTime){
+	    Node* newNode = (Node*)malloc(sizeof(Node));
+	    newNode->data=data;
+	    newNode->prev=ptr;
+	    newNode->next=ptr->next;
+	    ptr->next->prev=newNode;
+	    ptr->next=newNode;
+	    q->numOfData++;
+	    return;
+	}
+    }
+    qPush(q, data);
+}
+
 
 int getTotalServiceTime(qData* task, int numOfTask)
 {
@@ -131,7 +145,7 @@ qData qNull()
 {
     qData nullData;
     memset(&nullData, 0, sizeof(qData));
-    
+
     return nullData;
 }
 
@@ -147,7 +161,8 @@ int checkNull(qData x)
 void SJF(qData task[], int numOfTask)
 {
     int i, j;
-    int n;
+    // int n;
+
     qData nullData = qNull();
     qData procTask = nullData;
 
@@ -157,19 +172,29 @@ void SJF(qData task[], int numOfTask)
     int totalServiceTime = getTotalServiceTime(task, numOfTask);
 
     for(i=0;i<totalServiceTime;i++){
-	n=0;
-	for(j=0;j<numOfTask;j++)
-	    if(task[j].arrivalTime == i)
-		n++;
-	if(!n){}
-	else{
-	    sort(&task, numOfTask);
-	    for(j=0; j<numOfTask; j++){
-		if(task[j].arrivalTime == i && task[j].serviceTime){
-		    qPush(&q, task[j]);
-		}
+	for(j=0;j<numOfTask;j++){
+	    if(task[j].arrivalTime == i){
+		sjfPush(&q, task[j]);
 	    }
 	}
+
+	/*
+	   n = 0;
+	   for(j=0;j<numOfTask;j++)
+	   if(task[j].arrivalTime == i)
+	   n++;
+	   if(!n){}
+	   else{
+	   sort(&task, numOfTask);
+	   for(j=0; j<numOfTask; j++){
+	   if(task[j].arrivalTime == i && task[j].serviceTime){
+	   qPush(&q, task[j]);
+	   }
+	   }
+	   }
+	 */ // Amend prev version
+
+
 
 	if(checkNull(procTask)){
 	    procTask = qPop(&q);
