@@ -1,8 +1,8 @@
 /*
  *	DKU Operating System Lab
  *	    Lab1 (Scheduler Algorithm Simulator)
- *	    Student id : 
- *	    Student name : 
+ *	    Student id : 32131728
+ *	    Student name : Yoon Han Sol 
  *
  *   lab1_sched.c :
  *       - Lab1 source file.
@@ -103,9 +103,13 @@ int getTotalServiceTime(qData* task, int numOfTask)
 {
     int i;
     int total=0;
-    for(i=0;i<numOfTask;i++)
+    int min=9999;
+    for(i=0;i<numOfTask;i++){
+	if(task[i].arrivalTime<min)
+	    min=task[i].arrivalTime;
 	total+=task[i].serviceTime;
-    return total;
+    }
+    return min + total;
 }
 
 void quickSort(qData **x, int left, int right)
@@ -230,5 +234,49 @@ void RR(qData task[], int numOfTask)
 	*procTask = qPop(&q);
 	printf("%c ", procTask->name);
 	procTask->serviceTime--;
+    }
+}
+
+void RRwithTQ(qData task[], int numOfTask, int timeQuantum)
+{
+    int i,j;
+    int totalServiceTime = getTotalServiceTime(task, numOfTask);
+
+    Queue q;
+    qInit(&q);
+
+    qData nullData = qNull();
+    qData *procTask = &nullData;
+    int pCount = 0;
+
+    for(i=0; i<totalServiceTime ; i++){
+	for(j=0;j<numOfTask;j++)
+	    if(task[j].arrivalTime == i)
+		qPush(&q, task[j]);
+	
+	if(checkNull(*procTask))
+	    *procTask=qPop(&q);
+	if(checkNull(*procTask))
+	    continue;
+
+	if(!checkNull(*procTask) && procTask->serviceTime==0){
+	    procTask=&nullData;
+	    pCount=0;
+	}
+	else if(pCount >= timeQuantum){
+	    qPush(&q, *procTask);
+	    pCount=0;
+	}
+	else if(pCount < timeQuantum){
+	    printf("%c ", procTask->name);
+	    procTask->serviceTime--;
+	    pCount++;
+	    continue;
+	}
+	
+	*procTask = qPop(&q);
+	printf("%c ", procTask->name);
+	procTask->serviceTime--;
+	pCount++;
     }
 }

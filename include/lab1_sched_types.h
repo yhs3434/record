@@ -52,6 +52,7 @@ void sort(qData** task, int numOfTask);
 
 void SJF(qData task[], int numOfTask);
 void RR(qData task[], int numOfTask);
+void RRwithTQ(qData task[], int numOfTask, int timeQuantum);
 
 #endif /* LAB1_HEADER_H*/
 

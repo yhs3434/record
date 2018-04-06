@@ -36,9 +36,9 @@
 int main(int argc, char *argv[]){
     	Queue q;
 	qInit(&q);
-	qData taskArr[]={{'A', 0, 3},{'B', 2, 6},{'C',4,4},{'D',6,5},{'E',8,2}};
+	qData taskArr[]={{'A', 1, 3},{'B', 3, 6},{'C',5,4},{'D',7,5},{'E',9,2}};
 	
-	RR(taskArr, 5);
+	RRwithTQ(taskArr, 5, 1);
 	puts("");
 	
 	return 0;
