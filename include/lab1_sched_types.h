@@ -43,9 +43,15 @@ typedef struct _queue
 void qInit(Queue *q);
 void qPush(Queue *q, qData data);
 qData qPop(Queue *q);
-void SJF(qData task[], int numOfTask);
 qData qNull();
 int checkNull(qData x);
+void sjfPush(Queue *q, qData data);
+int getTotalServiceTime(qData* task, int numOfTask);
+void quickSort(qData **x, int left, int right);
+void sort(qData** task, int numOfTask);
+
+void SJF(qData task[], int numOfTask);
+void RR(qData task[], int numOfTask);
 
 #endif /* LAB1_HEADER_H*/
 

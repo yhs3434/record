@@ -38,7 +38,7 @@ int main(int argc, char *argv[]){
 	qInit(&q);
 	qData taskArr[]={{'A', 0, 3},{'B', 2, 6},{'C',4,4},{'D',6,5},{'E',8,2}};
 	
-	SJF(taskArr, 5);
+	RR(taskArr, 5);
 	puts("");
 	
 	return 0;

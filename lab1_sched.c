@@ -192,9 +192,7 @@ void SJF(qData task[], int numOfTask)
 	   }
 	   }
 	   }
-	 */ // Amend prev version
-
-
+	 */ // Amendded prev version
 
 	if(checkNull(procTask)){
 	    procTask = qPop(&q);
@@ -209,4 +207,28 @@ void SJF(qData task[], int numOfTask)
 	}
     }
     printf("\n");
+}
+
+void RR(qData task[], int numOfTask)
+{
+    int i,j;
+    int totalServiceTime = getTotalServiceTime(task, numOfTask);
+    
+    Queue q;
+    qInit(&q);
+
+    qData nullData = qNull();
+    qData *procTask = &nullData;
+
+    for(i=0;i<totalServiceTime;i++){
+	for(j=0;j<numOfTask;j++)
+	    if(task[j].arrivalTime == i)
+		qPush(&q, task[j]);
+	
+	if(!checkNull(*procTask) && procTask->serviceTime>0)
+	    qPush(&q, *procTask);
+	*procTask = qPop(&q);
+	printf("%c ", procTask->name);
+	procTask->serviceTime--;
+    }
 }
