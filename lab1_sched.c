@@ -277,3 +277,98 @@ void RRwithTQ(qData task[], int numOfTask, int timeQuantum)
 	pCount++;
     }
 }
+
+void LInit(Lottery *l)
+{
+	l->head = (LNode*)malloc(sizeof(LNode));
+	l->tail = (LNode*)malloc(sizeof(LNode));
+	l->head->prev=NULL;
+	l->head->next=l->tail;
+	l->tail->prev=l->head;
+	l->tail->next=NULL;
+	l->numOfProcess=0;
+	l->totalTicket=0;
+}
+
+void LInsert(Lottery *l, Task task)
+{
+	int ticket = task.serviceTime * 10;
+	LNode *newNode = (LNode*)malloc(sizeof(LNode));
+	newNode->task = task;
+	newNode->ticket = ticket;
+	newNode->prev=l->head;
+	newNode->next=l->head->next;
+	l->head->next->prev=newNode;
+	l->head->next=newNode;
+	l->numOfProcess++;
+	l->totalTicket += ticket;
+}
+
+Task LDelete(Lottery *l, Task task)
+{
+	if(!l->numOfProcess){
+		printf("empty\n");
+		return qNull();
+	}
+
+	LNode *rNode, *cur;
+	Task rTask;
+
+	for(cur=l->head->next;cur!=l->tail;cur=cur->next)
+		if(cur->task.name == task.name)
+			rNode = cur;
+	rNode->prev->next=rNode->next;
+	rNode->next->prev=rNode->prev;
+	rTask = rNode->task;
+
+	l->totalTicket -= rNode->ticket;
+	l->numOfProcess--;
+	free(rNode);
+
+	return rTask;
+}
+
+Task* LVote(Lottery *l)
+{
+	int randomValue = ((int)rand() % l->totalTicket) + 1;
+	int sumTicket = 0;
+	LNode *cur;
+
+	for(cur = l->head->next;cur!=l->tail;cur=cur->next){
+		sumTicket += cur->ticket;
+		if(randomValue <= sumTicket)
+			break;
+	}
+	
+	return &(cur->task);
+}	
+
+void lottery(Task task[], int numOfTask)
+{
+	int i, j;
+
+	srand(time(NULL));
+	
+	Lottery l;
+	LInit(&l);
+	
+	Task nullData = qNull();
+	Task *procTask = &nullData;
+
+	for(i=0;i<MAX;i++){
+		for(j=0;j<numOfTask;j++){
+			if(task[j].arrivalTime == i){
+				LInsert(&l, task[j]);
+			}
+		}
+		if(!l.numOfProcess)
+			continue;
+		procTask=LVote(&l);
+		if(checkNull(*procTask))
+			continue;
+		printf("%c ",procTask->name);
+		if(!(--procTask->serviceTime))
+			LDelete(&l, *procTask);
+	}
+	printf("\n");
+}

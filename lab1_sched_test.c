@@ -36,11 +36,11 @@
 int main(int argc, char *argv[]){
     	Queue q;
 	qInit(&q);
-	qData taskArr[]={{'A', 1, 3},{'B', 3, 6},{'C',5,4},{'D',7,5},{'E',9,2}};
+	qData taskArr[]={{'A', 1, 3},{'B', 1, 6},{'C',1,4},{'D',1,5},{'E',1,2}};
 	
-	RRwithTQ(taskArr, 5, 1);
-	puts("");
-	
+	//RRwithTQ(taskArr, 5, 1);
+	lottery(taskArr, 5);
+
 	return 0;
 }
 

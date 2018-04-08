@@ -21,6 +21,8 @@
 #define TRUE 1
 #define FALSE 0
 
+#define MAX 100
+
 typedef struct _data{
     char name;
     int arrivalTime;
@@ -40,6 +42,23 @@ typedef struct _queue
 	Node *tail;
 }Queue;
 
+typedef qData Task;
+
+typedef struct _lottery_node{
+	Task task;
+	int ticket;
+	struct _lottery_node *prev;
+	struct _lottery_node *next;
+}LNode;
+
+typedef struct _lottery{
+	int numOfProcess;
+	int totalTicket;
+	LNode *head;
+	LNode *tail;
+}Lottery;
+	
+
 void qInit(Queue *q);
 void qPush(Queue *q, qData data);
 qData qPop(Queue *q);
@@ -53,6 +72,12 @@ void sort(qData** task, int numOfTask);
 void SJF(qData task[], int numOfTask);
 void RR(qData task[], int numOfTask);
 void RRwithTQ(qData task[], int numOfTask, int timeQuantum);
+
+void LInit(Lottery *l);
+void LInsert(Lottery *l, Task task);
+Task LDelete(Lottery *l, Task task);
+Task* LVote(Lottery *l);
+void lottery(Task task[], int numOfTask);
 
 #endif /* LAB1_HEADER_H*/
 
