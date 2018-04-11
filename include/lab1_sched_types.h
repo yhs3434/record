@@ -83,7 +83,10 @@ void LInsert(Lottery *l, Task task);
 Task LDelete(Lottery *l, Task task);
 Task* LVote(Lottery *l);
 void lottery(Task task[], int numOfTask);
+
+int getLimitProcTime(int qNum, int tq);
 void MLFQ(Task task[], int numOfTask);
+void MLFQ2(Task task[], int numOfTask, int tq);
 
 #endif /* LAB1_HEADER_H*/
 

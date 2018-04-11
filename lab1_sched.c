@@ -443,6 +443,88 @@ void MLFQ(Task task[], int numOfTask)
 			procTask = nullData;
 			qNum=_noQ;
 		}
+	}
+}
+
+int getLimitProcTime(int qNum, int tq)
+{
+	if(qNum==_q1)
+		return 1;
+	else if(qNum==_q2)
+		return tq;
+	else if(qNum==_q3)
+		return tq*tq;
+	else
+		return FALSE;
+}
+
+void MLFQ2(Task task[], int numOfTask, int tq)
+{
+	int i,j;
+	Queue q1, q2, q3;
+	qInit(&q1);
+	qInit(&q2);
+	qInit(&q3);
+
+	Task nullData = qNull();
+	Task procTask = nullData;
+	int procTime = 0;
+	int qNum = _noQ;
+	int checkNextArrival;
+
+	for(i=0; i<MAX;i++){
+		for(j=0; j<numOfTask; j++){
+			if(task[j].arrivalTime == i){
+				qPush(&q1, task[j]);
+			}
+		}
+
+		if(checkNull(procTask)){
+			if(checkNull(procTask=qPop(&q1))){
+				if(checkNull(procTask=qPop(&q2))){
+					if(checkNull(procTask=qPop(&q3))){
+						continue;
+					}else{ qNum=_q3; }
+				}else{ qNum=_q2; }
+			}else{ qNum=_q1; }
+		}
+
+		printf("%c ", procTask.name);
+		procTime++;
+
+		if(!(--procTask.serviceTime)){
+			procTask = nullData;
+			qNum=_noQ;
+		}
+		else if(procTime<(getLimitProcTime(qNum, tq))){
+			
+		}
+		else{
+			checkNextArrival=FALSE;
+			for(j=0; j<numOfTask; j++)
+				if(task[j].arrivalTime==i+1){
+					checkNextArrival=TRUE;
+					break;
+				}
+			// If there is not any task in next time
+			if(qNum==_q1){
+				if(!checkNextArrival && qIsEmpty(&q1) && qIsEmpty(&q2) && qIsEmpty(&q3))
+					qPush(&q1, procTask);
+				else
+					qPush(&q2, procTask);
+			}       
+			else if(qNum==_q2){
+				if(!checkNextArrival && qIsEmpty(&q2) && qIsEmpty(&q3))
+					qPush(&q2, procTask);
+				else
+					qPush(&q3, procTask);
+			}   
+			else
+				qPush(&q3, procTask);
+			procTask = nullData;
+			procTime = 0;
+			qNum=_noQ;
+		}
 
 	}
 }

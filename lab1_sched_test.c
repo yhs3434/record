@@ -40,7 +40,8 @@ int main(int argc, char *argv[]){
 	
 	//RRwithTQ(taskArr, 5, 1);
 	//lottery(taskArr, 5);
-	MLFQ(taskArr, 5);
+	//MLFQ(taskArr, 5);
+	MLFQ2(taskArr, 5, 2);
 
 	return 0;
 }
