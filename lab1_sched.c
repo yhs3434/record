@@ -34,248 +34,256 @@
 
 void qInit(Queue *q)
 {
-    q->numOfData = 0;
-    q->head = (Node*)malloc(sizeof(Node));
-    q->tail = (Node*)malloc(sizeof(Node));
-    q->head->prev=NULL;
-    q->head->next=q->tail;
-    q->head->data=qNull();
-    q->tail->prev=q->head;
-    q->tail->next=NULL;
-    q->tail->data=qNull();
+	q->numOfData = 0;
+	q->head = (Node*)malloc(sizeof(Node));
+	q->tail = (Node*)malloc(sizeof(Node));
+	q->head->prev=NULL;
+	q->head->next=q->tail;
+	q->head->data=qNull();
+	q->tail->prev=q->head;
+	q->tail->next=NULL;
+	q->tail->data=qNull();
 }
 
 void qPush(Queue *q, qData data)
 {
-    Node *newNode = (Node*)malloc(sizeof(Node));
-    newNode->data=data;
+	Node *newNode = (Node*)malloc(sizeof(Node));
+	newNode->data=data;
 
-    newNode->prev=q->head;
-    newNode->next=q->head->next;
-    q->head->next->prev=newNode;
-    q->head->next=newNode;
-    q->numOfData++;
+	newNode->prev=q->head;
+	newNode->next=q->head->next;
+	q->head->next->prev=newNode;
+	q->head->next=newNode;
+	q->numOfData++;
 
-    return;
+	return;
 }
 
 qData qPop(Queue *q)
 {
-    if(!q->numOfData){
-	printf("Queue is empty\n");
-	return qNull();
-    }
-    Node *rNode = q->tail->prev;
-    qData rData = rNode->data;
-    rNode->prev->next=rNode->next;
-    rNode->next->prev=rNode->prev;
-    free(rNode);
-    q->numOfData--;
+	if(!q->numOfData){
+		// printf("Queue is empty\n");
+		return qNull();
+	}
+	Node *rNode = q->tail->prev;
+	qData rData = rNode->data;
+	rNode->prev->next=rNode->next;
+	rNode->next->prev=rNode->prev;
+	free(rNode);
+	q->numOfData--;
 
-    return rData;
+	return rData;
+}
+
+int qIsEmpty(Queue *q)
+{
+	if(q->head->next == q->tail)
+		return TRUE;
+	else
+		return FALSE;
 }
 
 void sjfPush(Queue *q, qData data)
 {
-    if(!q->numOfData){
-	qPush(q, data);
-	return;
-    }
-
-    Node* ptr = q->tail->prev;
-    for(;ptr!=q->head;ptr=ptr->prev){
-	if(data.serviceTime < ptr->data.serviceTime){
-	    Node* newNode = (Node*)malloc(sizeof(Node));
-	    newNode->data=data;
-	    newNode->prev=ptr;
-	    newNode->next=ptr->next;
-	    ptr->next->prev=newNode;
-	    ptr->next=newNode;
-	    q->numOfData++;
-	    return;
+	if(!q->numOfData){
+		qPush(q, data);
+		return;
 	}
-    }
-    qPush(q, data);
+
+	Node* ptr = q->tail->prev;
+	for(;ptr!=q->head;ptr=ptr->prev){
+		if(data.serviceTime < ptr->data.serviceTime){
+			Node* newNode = (Node*)malloc(sizeof(Node));
+			newNode->data=data;
+			newNode->prev=ptr;
+			newNode->next=ptr->next;
+			ptr->next->prev=newNode;
+			ptr->next=newNode;
+			q->numOfData++;
+			return;
+		}
+	}
+	qPush(q, data);
 }
 
 
 int getTotalServiceTime(qData* task, int numOfTask)
 {
-    int i;
-    int total=0;
-    int min=9999;
-    for(i=0;i<numOfTask;i++){
-	if(task[i].arrivalTime<min)
-	    min=task[i].arrivalTime;
-	total+=task[i].serviceTime;
-    }
-    return min + total;
+	int i;
+	int total=0;
+	int min=9999;
+	for(i=0;i<numOfTask;i++){
+		if(task[i].arrivalTime<min)
+			min=task[i].arrivalTime;
+		total+=task[i].serviceTime;
+	}
+	return min + total;
 }
 
 void quickSort(qData **x, int left, int right)
 {
-    int i=left;
-    int j=right;
-    int pivot = (*x)[(left+right)/2].serviceTime;
-    qData temp;
+	int i=left;
+	int j=right;
+	int pivot = (*x)[(left+right)/2].serviceTime;
+	qData temp;
 
-    while(i<=j){
-	while((*x)[i].serviceTime < pivot)
-	    i++;
-	while((*x)[j].serviceTime > pivot)
-	    j--;
+	while(i<=j){
+		while((*x)[i].serviceTime < pivot)
+			i++;
+		while((*x)[j].serviceTime > pivot)
+			j--;
 
-	if(i<=j){
-	    temp=(*x)[i];
-	    (*x)[i]=(*x)[j];
-	    (*x)[j]=temp;
-	    i++;
-	    j--;
+		if(i<=j){
+			temp=(*x)[i];
+			(*x)[i]=(*x)[j];
+			(*x)[j]=temp;
+			i++;
+			j--;
+		}
 	}
-    }
 
-    if(left < j)
-	quickSort(x, left, j);
-    if(i < right)
-	quickSort(x, i, right);
+	if(left < j)
+		quickSort(x, left, j);
+	if(i < right)
+		quickSort(x, i, right);
 }
 
 void sort(qData** task, int numOfTask)
 {
-    quickSort(task, 0, numOfTask-1);
+	quickSort(task, 0, numOfTask-1);
 }
 
 qData qNull()
 {
-    qData nullData;
-    memset(&nullData, 0, sizeof(qData));
+	qData nullData;
+	memset(&nullData, 0, sizeof(qData));
 
-    return nullData;
+	return nullData;
 }
 
 int checkNull(qData x)
 {
-    qData qNULL = qNull();
-    if(x.name==qNULL.name && x.serviceTime==qNULL.serviceTime && x.arrivalTime==qNULL.arrivalTime)
-	return TRUE;
-    else
-	return FALSE;
+	qData qNULL = qNull();
+	if(x.name==qNULL.name && x.serviceTime==qNULL.serviceTime && x.arrivalTime==qNULL.arrivalTime)
+		return TRUE;
+	else
+		return FALSE;
 }
 
 void SJF(qData task[], int numOfTask)
 {
-    int i, j;
-    // int n;
+	int i, j;
+	// int n;
 
-    qData nullData = qNull();
-    qData procTask = nullData;
+	qData nullData = qNull();
+	qData procTask = nullData;
 
-    Queue q;
-    qInit(&q);
+	Queue q;
+	qInit(&q);
 
-    int totalServiceTime = getTotalServiceTime(task, numOfTask);
+	int totalServiceTime = getTotalServiceTime(task, numOfTask);
 
-    for(i=0;i<totalServiceTime;i++){
-	for(j=0;j<numOfTask;j++){
-	    if(task[j].arrivalTime == i){
-		sjfPush(&q, task[j]);
-	    }
+	for(i=0;i<totalServiceTime;i++){
+		for(j=0;j<numOfTask;j++){
+			if(task[j].arrivalTime == i){
+				sjfPush(&q, task[j]);
+			}
+		}
+
+		/*
+		   n = 0;
+		   for(j=0;j<numOfTask;j++)
+		   if(task[j].arrivalTime == i)
+		   n++;
+		   if(!n){}
+		   else{
+		   sort(&task, numOfTask);
+		   for(j=0; j<numOfTask; j++){
+		   if(task[j].arrivalTime == i && task[j].serviceTime){
+		   qPush(&q, task[j]);
+		   }
+		   }
+		   }
+		 */ // Amendded prev version
+
+		if(checkNull(procTask)){
+			procTask = qPop(&q);
+			printf("%c ", procTask.name);
+			if(!(--procTask.serviceTime))
+				procTask = nullData;
+		}
+		else{
+			printf("%c ", procTask.name);
+			if(!(--procTask.serviceTime))
+				procTask = nullData;
+		}
 	}
-
-	/*
-	   n = 0;
-	   for(j=0;j<numOfTask;j++)
-	   if(task[j].arrivalTime == i)
-	   n++;
-	   if(!n){}
-	   else{
-	   sort(&task, numOfTask);
-	   for(j=0; j<numOfTask; j++){
-	   if(task[j].arrivalTime == i && task[j].serviceTime){
-	   qPush(&q, task[j]);
-	   }
-	   }
-	   }
-	 */ // Amendded prev version
-
-	if(checkNull(procTask)){
-	    procTask = qPop(&q);
-	    printf("%c ", procTask.name);
-	    if(!(--procTask.serviceTime))
-		procTask = nullData;
-	}
-	else{
-	    printf("%c ", procTask.name);
-	    if(!(--procTask.serviceTime))
-		procTask = nullData;
-	}
-    }
-    printf("\n");
+	printf("\n");
 }
 
 void RR(qData task[], int numOfTask)
 {
-    int i,j;
-    int totalServiceTime = getTotalServiceTime(task, numOfTask);
-    
-    Queue q;
-    qInit(&q);
+	int i,j;
+	int totalServiceTime = getTotalServiceTime(task, numOfTask);
 
-    qData nullData = qNull();
-    qData *procTask = &nullData;
+	Queue q;
+	qInit(&q);
 
-    for(i=0;i<totalServiceTime;i++){
-	for(j=0;j<numOfTask;j++)
-	    if(task[j].arrivalTime == i)
-		qPush(&q, task[j]);
-	
-	if(!checkNull(*procTask) && procTask->serviceTime>0)
-	    qPush(&q, *procTask);
-	*procTask = qPop(&q);
-	printf("%c ", procTask->name);
-	procTask->serviceTime--;
-    }
+	qData nullData = qNull();
+	qData *procTask = &nullData;
+
+	for(i=0;i<totalServiceTime;i++){
+		for(j=0;j<numOfTask;j++)
+			if(task[j].arrivalTime == i)
+				qPush(&q, task[j]);
+
+		if(!checkNull(*procTask) && procTask->serviceTime>0)
+			qPush(&q, *procTask);
+		*procTask = qPop(&q);
+		printf("%c ", procTask->name);
+		procTask->serviceTime--;
+	}
 }
 
 void RRwithTQ(qData task[], int numOfTask, int timeQuantum)
 {
-    int i,j;
-    int totalServiceTime = getTotalServiceTime(task, numOfTask);
+	int i,j;
+	int totalServiceTime = getTotalServiceTime(task, numOfTask);
 
-    Queue q;
-    qInit(&q);
+	Queue q;
+	qInit(&q);
 
-    qData nullData = qNull();
-    qData *procTask = &nullData;
-    int pCount = 0;
+	qData nullData = qNull();
+	qData *procTask = &nullData;
+	int pCount = 0;
 
-    for(i=0; i<totalServiceTime ; i++){
-	for(j=0;j<numOfTask;j++)
-	    if(task[j].arrivalTime == i)
-		qPush(&q, task[j]);
-	
-	if(checkNull(*procTask))
-	    *procTask=qPop(&q);
-	if(checkNull(*procTask))
-	    continue;
+	for(i=0; i<totalServiceTime ; i++){
+		for(j=0;j<numOfTask;j++)
+			if(task[j].arrivalTime == i)
+				qPush(&q, task[j]);
 
-	if(procTask->serviceTime==0){
-	    procTask=&nullData;
-	    pCount=0;
-	    *procTask=qPop(&q);
-	    if(checkNull(*procTask))
-		continue;
+		if(checkNull(*procTask))
+			*procTask=qPop(&q);
+		if(checkNull(*procTask))
+			continue;
+
+		if(procTask->serviceTime==0){
+			procTask=&nullData;
+			pCount=0;
+			*procTask=qPop(&q);
+			if(checkNull(*procTask))
+				continue;
+		}
+		else if(pCount >= timeQuantum){
+			qPush(&q, *procTask);
+			pCount=0;
+			*procTask=qPop(&q);
+		}
+
+		printf("%c ", procTask->name);
+		procTask->serviceTime--;
+		pCount++;
 	}
-	else if(pCount >= timeQuantum){
-	    qPush(&q, *procTask);
-	    pCount=0;
-	    *procTask=qPop(&q);
-	}
-	
-	printf("%c ", procTask->name);
-	procTask->serviceTime--;
-	pCount++;
-    }
 }
 
 void LInit(Lottery *l)
@@ -339,7 +347,7 @@ Task* LVote(Lottery *l)
 		if(randomValue <= sumTicket)
 			break;
 	}
-	
+
 	return &(cur->task);
 }	
 
@@ -348,10 +356,10 @@ void lottery(Task task[], int numOfTask)
 	int i, j;
 
 	srand(time(NULL));
-	
+
 	Lottery l;
 	LInit(&l);
-	
+
 	Task nullData = qNull();
 	Task *procTask = &nullData;
 
@@ -371,4 +379,70 @@ void lottery(Task task[], int numOfTask)
 			LDelete(&l, *procTask);
 	}
 	printf("\n");
+}
+
+void MLFQ(Task task[], int numOfTask)
+{
+	int i,j;
+	Queue q1, q2, q3;
+	qInit(&q1);
+	qInit(&q2);
+	qInit(&q3);
+
+	Task nullData = qNull();
+	Task procTask = nullData;
+
+	int qNum = _noQ;
+	int checkNextArrival;
+
+	for(i=0; i<MAX;i++){
+		for(j=0; j<numOfTask; j++){
+			if(task[j].arrivalTime == i){
+				qPush(&q1, task[j]);
+			}
+		}
+
+		if(checkNull(procTask)){
+			if(checkNull(procTask=qPop(&q1))){
+				if(checkNull(procTask=qPop(&q2))){
+					if(checkNull(procTask=qPop(&q3))){
+						continue;
+					}else{ qNum=_q3; }
+				}else{ qNum=_q2; }
+			}else{ qNum=_q1; }
+		}
+
+		printf("%c ", procTask.name);
+
+		if(!(--procTask.serviceTime)){
+			procTask = nullData;
+			qNum=_noQ;
+		}
+		else{
+			checkNextArrival=FALSE;
+			for(j=0; j<numOfTask; j++)
+				if(task[j].arrivalTime==i+1){
+					checkNextArrival=TRUE;
+					break;
+				}
+			// If there is not any task in next time
+			if(qNum==_q1){
+				if(!checkNextArrival && qIsEmpty(&q1) && qIsEmpty(&q2) && qIsEmpty(&q3))
+					qPush(&q1, procTask);
+				else
+					qPush(&q2, procTask);
+			}       
+			else if(qNum==_q2){
+				if(!checkNextArrival && qIsEmpty(&q2) && qIsEmpty(&q3))
+					qPush(&q2, procTask);
+				else
+					qPush(&q3, procTask);
+			}   
+			else
+				qPush(&q3, procTask);
+			procTask = nullData;
+			qNum=_noQ;
+		}
+
+	}
 }

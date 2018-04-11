@@ -57,11 +57,16 @@ typedef struct _lottery{
 	LNode *head;
 	LNode *tail;
 }Lottery;
-	
+
+enum _q
+{
+	_noQ, _q1, _q2, _q3
+};
 
 void qInit(Queue *q);
 void qPush(Queue *q, qData data);
 qData qPop(Queue *q);
+int qIsEmpty(Queue *q);
 qData qNull();
 int checkNull(qData x);
 void sjfPush(Queue *q, qData data);
@@ -78,6 +83,7 @@ void LInsert(Lottery *l, Task task);
 Task LDelete(Lottery *l, Task task);
 Task* LVote(Lottery *l);
 void lottery(Task task[], int numOfTask);
+void MLFQ(Task task[], int numOfTask);
 
 #endif /* LAB1_HEADER_H*/
 
