@@ -22,6 +22,7 @@
 #define FALSE 0
 
 #define MAX 100
+#define Taskss 6
 
 typedef struct _data{
     char name;
@@ -69,7 +70,7 @@ enum _q
 };
 
 void swap(qData *a, qData *b);
-void ATsort(qData task[]);
+void ATsort(qData task[], int numOfTask);
 void FCFS(qData *task, int numOfTask, Queue* schedQ);
 
 void Round_Robin(qData *task, int numOfTask, int qt, Queue* schedQ);

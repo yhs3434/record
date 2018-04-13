@@ -43,7 +43,7 @@
  **/
 
 // static variable
-int at[numOfTask], st[numOfTask], rq[50] = { 0, },stm[50] = { 0, };
+int at[Taskss], st[Taskss], rq[50] = { 0, },stm[50] = { 0, };
 int node = 0;
 int arr[20];
 int num = 0;
@@ -149,7 +149,7 @@ void swap(qData *a, qData *b)
     *b = task;
 }
 
-void ATsort(qData task[])
+void ATsort(qData task[], int numOfTask)
 {
     bool swapped;
 
@@ -171,7 +171,7 @@ void FCFS(qData *task, int numOfTask, Queue* schedQ)
 {
     int x, y;
 
-    ATsort(task);
+    ATsort(task, numOfTask);
 
     arrinit();
 
