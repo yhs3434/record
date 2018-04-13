@@ -24,20 +24,13 @@
 #define MAX 100
 #define Taskss 5
 
-// struct
-struct _qData {
-    char name;
-    int at;
-    int st;
-};
-struct _qData* temp;
-typedef struct _qData qData2;
 
 typedef struct _data{
     char name;
     int arrivalTime;
     int serviceTime;
 }qData;
+struct _qData* temp;
 
 typedef struct _node{
     qData data;

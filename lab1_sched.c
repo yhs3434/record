@@ -140,16 +140,16 @@ void chart()
     printf("\n\n");
 }
 
-void swap(struct _qData *a, struct _qData *b)
+void swap(qData *a, qData *b)
 {
-    struct _qData task;
+    qData task;
 
     task = *a;
     *a = *b;
     *b = task;
 }
 
-void ATsort(struct _qData task[])
+void ATsort(qData task[])
 {
     bool swapped;
 
@@ -158,7 +158,7 @@ void ATsort(struct _qData task[])
 	swapped = false;
 	for (int count = 0; count<(Taskss - 1); count++)
 	{
-	    if (task[count].at>task[count+1].at)
+	    if (task[count].arrivalTime>task[count+1].arrivalTime)
 	    {
 		swap(&task[count], &task[count + 1]);
 		swapped = true;
@@ -167,7 +167,7 @@ void ATsort(struct _qData task[])
     } while (swapped);
 }
 
-void FCFS(struct _qData *task)
+void FCFS(qData *task)
 {
     int x, y;
 
@@ -179,7 +179,7 @@ void FCFS(struct _qData *task)
 
     for (x = 0; x < Taskss; x++)
     {
-	for (y = 0; y < task[x].st; y++)
+	for (y = 0; y < task[x].serviceTime; y++)
 	{
 	    printf("%c ", task[x].name);
 	    arr[num] = task[x].name;
@@ -190,9 +190,9 @@ void FCFS(struct _qData *task)
 }
 
 // RR use SeachStack,AddQue
-void Round_Robin(struct _qData *task,int qt){
+void Round_Robin(qData *task,int qt){
 
-    struct _qData temp[Taskss];
+    qData temp[Taskss];
     int servicetime;
     int time = 0;
     int pnt = 0; //pnt = process name table, 0~1 = A ~ E 
@@ -200,14 +200,14 @@ void Round_Robin(struct _qData *task,int qt){
 
     arrinit();
 
-    memcpy(temp, task, sizeof(struct _qData)*Taskss);
+    memcpy(temp, task, sizeof(qData)*Taskss);
 
     printf("================RRwithTQ(q = %d)================= \n",qt);
 
     for (int x = 0; x<Taskss; x++) {
-	at[x] = temp[x].at; //at = task's arrival time
-	st[x] = temp[x].st; //st = task's service time
-	stm[x] = temp[x].st; //stm = service time management
+	at[x] = temp[x].arrivalTime; //arrivalTime = task's arrival time
+	st[x] = temp[x].serviceTime; //serviceTime = task's service time
+	stm[x] = temp[x].serviceTime; //stm = service time management
     }
     do {
 	if (flag == 0) {
@@ -251,8 +251,8 @@ void Round_Robin(struct _qData *task,int qt){
 
 	for (int i=0; i < qt; i++)
 	{
-	    temp[pnt].st--;
-	    if(temp[pnt].st >= 0){
+	    temp[pnt].serviceTime--;
+	    if(temp[pnt].serviceTime >= 0){
 		printf("%c ", temp[pnt].name);
 		arr[num] = temp[pnt].name;
 		num++;
