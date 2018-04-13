@@ -35,12 +35,12 @@
 
 
 /**
-* =============================================
-*					      =
-*	made by : 32131698  Nam Hye Min	      =
-*					      =
-* =============================================
-**/
+ * =============================================
+ *					      =
+ *	made by : 32131698  Nam Hye Min	      =
+ *					      =
+ * =============================================
+ **/
 
 // static variable
 int at[Taskss], st[Taskss], rq[50] = { 0, },stm[50] = { 0, };
@@ -50,95 +50,94 @@ int num = 0;
 
 void arrinit()
 {
-	num = 0;
-	for (int i = 0; i < 20; i++)
-	{
-		arr[i] = 0;
-	}
+    num = 0;
+    for (int i = 0; i < 20; i++)
+    {
+	arr[i] = 0;
+    }
 }
 
 void chart() 
 {
-	int x;
-	int A[20], B[20], C[20], D[20], E[20];
-	int full = 1;
-	int empty = 0;
-	
-	
-	for (x = 0; x < 20; x++) 
+    int x;
+    int A[20], B[20], C[20], D[20], E[20];
+    int full = 1;
+    int empty = 0;
+
+    for (x = 0; x < 20; x++) 
+    {
+	if (arr[x] == 'A')
 	{
-		if (arr[x] == 'A')
-		{
-			A[x] = full;
-			B[x] = empty;
-			C[x] = empty;
-			D[x] = empty;
-			E[x] = empty;
-		}
-		if (arr[x] == 'B')
-		{
-			A[x] = empty;
-			B[x] = full;
-			C[x] = empty;
-			D[x] = empty;
-			E[x] = empty;
-		}
-		if (arr[x] == 'C')
-		{
-			A[x] = empty;
-			B[x] = empty;
-			C[x] = full;
-			D[x] = empty;
-			E[x] = empty;
-		}
-		if (arr[x] == 'D')
-		{
-			A[x] = empty;
-			B[x] = empty;
-			C[x] = empty;
-			D[x] = full;
-			E[x] = empty;
-		}
-		if (arr[x] == 'E')
-		{
-			A[x] = empty;
-			B[x] = empty;
-			C[x] = empty;
-			D[x] = empty;
-			E[x] = full;
-		}
+	    A[x] = full;
+	    B[x] = empty;
+	    C[x] = empty;
+	    D[x] = empty;
+	    E[x] = empty;
 	}
-	printf("\nA :");
-	for (int y = 0; y < 20; y++)
+	if (arr[x] == 'B')
 	{
-		if (A[y] == empty)printf("□  ");
-		else printf("■  ");
+	    A[x] = empty;
+	    B[x] = full;
+	    C[x] = empty;
+	    D[x] = empty;
+	    E[x] = empty;
 	}
-	printf("\nB :");
-	for (int y = 0; y < 20; y++)
+	if (arr[x] == 'C')
 	{
-		if (B[y] == empty)printf("□  ");
-		else printf("■  ");
+	    A[x] = empty;
+	    B[x] = empty;
+	    C[x] = full;
+	    D[x] = empty;
+	    E[x] = empty;
 	}
-	printf("\nC :");
-	for (int y = 0; y < 20; y++)
+	if (arr[x] == 'D')
 	{
-		if (C[y] == empty)printf("□  ");
-		else printf("■  ");
+	    A[x] = empty;
+	    B[x] = empty;
+	    C[x] = empty;
+	    D[x] = full;
+	    E[x] = empty;
 	}
-	printf("\nD :");
-	for (int y = 0; y < 20; y++)
+	if (arr[x] == 'E')
 	{
-		if (D[y] == empty)printf("□  ");
-		else printf("■  ");
+	    A[x] = empty;
+	    B[x] = empty;
+	    C[x] = empty;
+	    D[x] = empty;
+	    E[x] = full;
 	}
-	printf("\nE :");
-	for (int y = 0; y < 20; y++)
-	{
-		if (E[y] == empty)printf("□  ");
-		else printf("■  ");
-	}
-	printf("\n");
+    }
+    printf("A ");
+    for (int y = 0; y < 20; y++)
+    {
+	if (A[y] == empty)printf("□ ");
+	else printf("■ ");
+    }
+    printf("\nB ");
+    for (int y = 0; y < 20; y++)
+    {
+	if (B[y] == empty)printf("□ ");
+	else printf("■ ");
+    }
+    printf("\nC ");
+    for (int y = 0; y < 20; y++)
+    {
+	if (C[y] == empty)printf("□ ");
+	else printf("■ ");
+    }
+    printf("\nD ");
+    for (int y = 0; y < 20; y++)
+    {
+	if (D[y] == empty)printf("□ ");
+	else printf("■ ");
+    }
+    printf("\nE ");
+    for (int y = 0; y < 20; y++)
+    {
+	if (E[y] == empty)printf("□ ");
+	else printf("■ ");
+    }
+    printf("\n\n");
 }
 
 void swap(struct _qData *a, struct _qData *b)
@@ -173,7 +172,7 @@ void FCFS(struct _qData *task)
     int x, y;
 
     ATsort(task);
-    
+
     arrinit();
 
     printf("==================FCFS================== \n");
@@ -184,7 +183,7 @@ void FCFS(struct _qData *task)
 	{
 	    printf("%c ", task[x].name);
 	    arr[num] = task[x].name;
-		num++;
+	    num++;
 	}
     }
     printf("\n\n");
@@ -198,7 +197,7 @@ void Round_Robin(struct _qData *task,int qt){
     int time = 0;
     int pnt = 0; //pnt = process name table, 0~1 = A ~ E 
     int flag=0;
-    
+
     arrinit();
 
     memcpy(temp, task, sizeof(struct _qData)*Taskss);
@@ -301,12 +300,12 @@ void AddQue(int pnt) {
 
 
 /**
-* =============================================
-*					      =
-*	made by : 32131728  Yoon Han Sol      =
-*					      =
-* =============================================
-**/	
+ * =============================================
+ *					      =
+ *	made by : 32131728  Yoon Han Sol      =
+ *					      =
+ * =============================================
+ **/	
 
 
 void qInit(Queue *q)
@@ -668,7 +667,6 @@ void MLFQ2(Task task[], int numOfTask, int tq, Queue* schedQ)
 	    qNum=_noQ;
 	}
     }
-    printf("\n");
 }
 
 void chartInit(Chart (*chart)[MAX], int row, int column)
@@ -704,7 +702,7 @@ void printChart(Queue* schedQ)
     Chart chart[5][MAX];
     chartInit(chart, 5, MAX);
     char process;
-    printf("\nChart\n");
+    printf("\n");
     int index = 0;
     while(!qIsEmpty(schedQ)){
 	process = qPop(schedQ).name;

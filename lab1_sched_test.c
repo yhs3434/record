@@ -43,9 +43,13 @@ int main(int argc, char *argv[]){
 	qData task1[]={{'A', 0, 3},{'B', 2, 6},{'C',4,4},{'D',6,5},{'E',8,2}};
 	qData2 task2[] = {{'A',0,3},{'B',2,6},{'C',4,4},{'D',6,5},{'E',8,2} };
 
+	printf("made by \tNam Hye Min\n\t\tYoon Han Sol\n\n");
 	FCFS(task2);
+	chart();
 	Round_Robin(task2, 1);
+	chart();
 	Round_Robin(task2, 4);
+	chart();
 	printf("============== SJF ==================\n");
 	SJF(task1, 5, &schedQ);
 	printChart(&schedQ);
