@@ -1,8 +1,8 @@
 /*
  *	DKU Operating System Lab
  *	    Lab1 (Scheduler Algorithm Simulator)
- *	    Student id : 
- *	    Student name : 
+ *	    Student id : 32131698, 32131728
+ *	    Student name : Nam Hye Min, Yoon Han Sol
  *
  *   lab1_sched_types.h :
  *       - lab1 header file.
@@ -85,6 +85,9 @@ void Round_Robin(struct _qData *task, int qt);
 void SearchStack01(int pnt, int tm);
 void SearchStack02(int pnt, int tm);
 void AddQue(int pnt);
+void arrinit();
+void chart();
+
 
 
 void qInit(Queue *q);

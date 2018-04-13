@@ -45,6 +45,101 @@
 // static variable
 int at[Taskss], st[Taskss], rq[50] = { 0, },stm[50] = { 0, };
 int node = 0;
+int arr[20];
+int num = 0;
+
+void arrinit()
+{
+	num = 0;
+	for (int i = 0; i < 20; i++)
+	{
+		arr[i] = 0;
+	}
+}
+
+void chart() 
+{
+	int x;
+	int A[20], B[20], C[20], D[20], E[20];
+	int full = 1;
+	int empty = 0;
+	
+	
+	for (x = 0; x < 20; x++) 
+	{
+		if (arr[x] == 'A')
+		{
+			A[x] = full;
+			B[x] = empty;
+			C[x] = empty;
+			D[x] = empty;
+			E[x] = empty;
+		}
+		if (arr[x] == 'B')
+		{
+			A[x] = empty;
+			B[x] = full;
+			C[x] = empty;
+			D[x] = empty;
+			E[x] = empty;
+		}
+		if (arr[x] == 'C')
+		{
+			A[x] = empty;
+			B[x] = empty;
+			C[x] = full;
+			D[x] = empty;
+			E[x] = empty;
+		}
+		if (arr[x] == 'D')
+		{
+			A[x] = empty;
+			B[x] = empty;
+			C[x] = empty;
+			D[x] = full;
+			E[x] = empty;
+		}
+		if (arr[x] == 'E')
+		{
+			A[x] = empty;
+			B[x] = empty;
+			C[x] = empty;
+			D[x] = empty;
+			E[x] = full;
+		}
+	}
+	printf("\nA :");
+	for (int y = 0; y < 20; y++)
+	{
+		if (A[y] == empty)printf("□  ");
+		else printf("■  ");
+	}
+	printf("\nB :");
+	for (int y = 0; y < 20; y++)
+	{
+		if (B[y] == empty)printf("□  ");
+		else printf("■  ");
+	}
+	printf("\nC :");
+	for (int y = 0; y < 20; y++)
+	{
+		if (C[y] == empty)printf("□  ");
+		else printf("■  ");
+	}
+	printf("\nD :");
+	for (int y = 0; y < 20; y++)
+	{
+		if (D[y] == empty)printf("□  ");
+		else printf("■  ");
+	}
+	printf("\nE :");
+	for (int y = 0; y < 20; y++)
+	{
+		if (E[y] == empty)printf("□  ");
+		else printf("■  ");
+	}
+	printf("\n");
+}
 
 void swap(struct _qData *a, struct _qData *b)
 {
@@ -78,6 +173,8 @@ void FCFS(struct _qData *task)
     int x, y;
 
     ATsort(task);
+    
+    arrinit();
 
     printf("==================FCFS================== \n");
 
@@ -86,6 +183,8 @@ void FCFS(struct _qData *task)
 	for (y = 0; y < task[x].st; y++)
 	{
 	    printf("%c ", task[x].name);
+	    arr[num] = task[x].name;
+		num++;
 	}
     }
     printf("\n\n");
@@ -99,6 +198,8 @@ void Round_Robin(struct _qData *task,int qt){
     int time = 0;
     int pnt = 0; //pnt = process name table, 0~1 = A ~ E 
     int flag=0;
+    
+    arrinit();
 
     memcpy(temp, task, sizeof(struct _qData)*Taskss);
 
@@ -154,6 +255,8 @@ void Round_Robin(struct _qData *task,int qt){
 	    temp[pnt].st--;
 	    if(temp[pnt].st >= 0){
 		printf("%c ", temp[pnt].name);
+		arr[num] = temp[pnt].name;
+		num++;
 	    }
 	}
 
