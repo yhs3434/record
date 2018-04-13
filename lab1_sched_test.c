@@ -44,17 +44,18 @@ int main(int argc, char *argv[]){
 	FCFS(task);
 	Round_Robin(task, 1);
 	Round_Robin(task, 4);
-	printf("==============SJF===============\n");
+	printf("============== SJF ==================\n");
 	SJF(taskArr, 5);
-	printf("\n");
-	RRwithTQ(taskArr, 5, 1);
-	printf("\n");
-	lottery(taskArr, 5);
-	printf("\n");
-	MLFQ(taskArr, 5);
-	printf("\n");	
+	// RRwithTQ(taskArr, 5, 1);
+	// printf("\n");
+	printf("\n============== MLFQ(1) ==============\n");
+	MLFQ2(taskArr, 5, 1);
+	
+	printf("\n\n============== MLFQ(2) ==============\n");
 	MLFQ2(taskArr, 5, 2);
-	printf("\n");
+	printf("\n\n============== Lottery ==============\n");
+	lottery(taskArr, 5);
+	
 
 	return 0;
 }
