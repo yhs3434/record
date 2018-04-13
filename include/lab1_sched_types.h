@@ -70,11 +70,11 @@ enum _q
     _noQ, _q1, _q2, _q3
 };
 
-void swap(struct _qData *a, struct _qData *b);
-void ATsort(struct _qData task[]);
-void FCFS(struct _qData *task);
+void swap(qData *a, qData *b);
+void ATsort(qData task[]);
+void FCFS(qData *task, Queue* schedQ);
 
-void Round_Robin(struct _qData *task, int qt);
+void Round_Robin(qData *task, int qt, Queue* schedQ);
 void SearchStack01(int pnt, int tm);
 void SearchStack02(int pnt, int tm);
 void AddQue(int pnt);

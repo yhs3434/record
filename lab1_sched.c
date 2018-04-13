@@ -167,7 +167,7 @@ void ATsort(qData task[])
     } while (swapped);
 }
 
-void FCFS(qData *task)
+void FCFS(qData *task, Queue* schedQ)
 {
     int x, y;
 
@@ -182,6 +182,7 @@ void FCFS(qData *task)
 	for (y = 0; y < task[x].serviceTime; y++)
 	{
 	    printf("%c ", task[x].name);
+	    qPush(schedQ, task[x]);
 	    arr[num] = task[x].name;
 	    num++;
 	}
@@ -190,8 +191,7 @@ void FCFS(qData *task)
 }
 
 // RR use SeachStack,AddQue
-void Round_Robin(qData *task,int qt){
-
+void Round_Robin(qData *task,int qt, Queue* schedQ){
     qData temp[Taskss];
     int servicetime;
     int time = 0;
@@ -254,6 +254,7 @@ void Round_Robin(qData *task,int qt){
 	    temp[pnt].serviceTime--;
 	    if(temp[pnt].serviceTime >= 0){
 		printf("%c ", temp[pnt].name);
+		qPush(schedQ, temp[pnt]);
 		arr[num] = temp[pnt].name;
 		num++;
 	    }
