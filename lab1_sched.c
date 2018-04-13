@@ -588,6 +588,7 @@ void printChart(Queue* schedQ)
 	index++;
     }
     for(i=0; i<5; i++){
+	printf("%c ",'A'+i);
 	for(j=0; j<index; j++){
 	    if(chart[i][j].check)
 		printf("■ ");
