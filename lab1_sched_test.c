@@ -40,8 +40,8 @@ int main(int argc, char *argv[]){
 	Queue schedQ;
 	qInit(&schedQ);
 	
-	qData task1[]={{'A', 0, 3},{'B', 2, 6},{'C',4,4},{'D',6,5},{'E',8,2}};
-	qData2 task2[] = {{'A',0,3},{'B',2,6},{'C',4,4},{'D',6,5},{'E',8,2} };
+	qData task1[]={{'A', 0, 7},{'B', 2, 10},{'C',4,3},{'D',6,5},{'E',8,2}};
+	qData2 task2[] = {{'A',0,7},{'B',2,10},{'C',4,3},{'D',6,5},{'E',8,2}};
 
 	printf("made by \tNam Hye Min\n\t\tYoon Han Sol\n\n");
 	FCFS(task2);
