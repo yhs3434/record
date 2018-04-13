@@ -382,20 +382,6 @@ void sjfPush(Queue *q, qData data)
     qPush(q, data);
 }
 
-
-int getTotalServiceTime(qData* task, int numOfTask)
-{
-    int i;
-    int total=0;
-    int min=9999;
-    for(i=0;i<numOfTask;i++){
-	if(task[i].arrivalTime<min)
-	    min=task[i].arrivalTime;
-	total+=task[i].serviceTime;
-    }
-    return min + total;
-}
-
 qData qNull()
 {
     qData nullData;
@@ -423,9 +409,7 @@ void SJF(qData task[], int numOfTask, Queue *schedQ)
     Queue q;
     qInit(&q);
 
-    int totalServiceTime = getTotalServiceTime(task, numOfTask);
-
-    for(i=0;i<totalServiceTime;i++){
+    for(i=0;i<MAX;i++){
 	for(j=0;j<numOfTask;j++){
 	    if(task[j].arrivalTime == i){
 		sjfPush(&q, task[j]);
@@ -433,7 +417,8 @@ void SJF(qData task[], int numOfTask, Queue *schedQ)
 	}
 
 	if(checkNull(procTask)){
-	    procTask = qPop(&q);
+	    if(checkNull(procTask = qPop(&q)))
+		continue;
 	    printf("%c ", procTask.name);
 	    qPush(schedQ, procTask);
 	    if(!(--procTask.serviceTime))
@@ -447,47 +432,6 @@ void SJF(qData task[], int numOfTask, Queue *schedQ)
 	}
     }
     printf("\n");
-}
-
-void RRwithTQ(qData task[], int numOfTask, int timeQuantum)
-{
-    int i,j;
-    int totalServiceTime = getTotalServiceTime(task, numOfTask);
-
-    Queue q;
-    qInit(&q);
-
-    qData nullData = qNull();
-    qData *procTask = &nullData;
-    int pCount = 0;
-
-    for(i=0; i<totalServiceTime ; i++){
-	for(j=0;j<numOfTask;j++)
-	    if(task[j].arrivalTime == i)
-		qPush(&q, task[j]);
-
-	if(checkNull(*procTask))
-	    *procTask=qPop(&q);
-	if(checkNull(*procTask))
-	    continue;
-
-	if(procTask->serviceTime==0){
-	    procTask=&nullData;
-	    pCount=0;
-	    *procTask=qPop(&q);
-	    if(checkNull(*procTask))
-		continue;
-	}
-	else if(pCount >= timeQuantum){
-	    qPush(&q, *procTask);
-	    pCount=0;
-	    *procTask=qPop(&q);
-	}
-
-	printf("%c ", procTask->name);
-	procTask->serviceTime--;
-	pCount++;
-    }
 }
 
 void LInit(Lottery *l)
