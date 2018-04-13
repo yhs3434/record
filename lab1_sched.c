@@ -624,37 +624,33 @@ void chartInit(Chart (*chart)[MAX], int row, int column)
     }
 }
 
-void chartPush(Chart (*chart)[MAX], char process, int index)
+void chartPush(Chart (*chart)[MAX], char process, int index, int numOfTask)
 {
     int row;
-    if(process == 'A')
-	row=0;
-    else if(process == 'B')
-	row=1;
-    else if(process == 'C')
-	row=2;
-    else if(process == 'D')
-	row=3;
-    else
-	row=4;
+
+    for(row=0; row<numOfTask; row++){
+	if(process == ('A'+row)){
+	    break;
+	}
+    }
 
     chart[row][index].check = TRUE;
 }
 
-void printChart(Queue* schedQ)
+void printChart(Queue* schedQ, int numOfTask)
 {
     int i, j;
-    Chart chart[5][MAX];
-    chartInit(chart, 5, MAX);
+    Chart chart[numOfTask][MAX];
+    chartInit(chart, numOfTask, MAX);
     char process;
     printf("\n");
     int index = 0;
     while(!qIsEmpty(schedQ)){
 	process = qPop(schedQ).name;
-	chartPush(chart, process, index);
+	chartPush(chart, process, index, numOfTask);
 	index++;
     }
-    for(i=0; i<5; i++){
+    for(i=0; i<numOfTask; i++){
 	printf("%c ",'A'+i);
 	for(j=0; j<index; j++){
 	    if(chart[i][j].check)

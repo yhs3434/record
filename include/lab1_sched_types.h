@@ -117,7 +117,7 @@ int getLimitProcTime(int qNum, int tq);
 // void MLFQ(Task task[], int numOfTask);
 void MLFQ2(Task task[], int numOfTask, int tq, Queue* schedQ);
 
-void printChart(Queue* schedQ);
+void printChart(Queue* schedQ, int numOfTask);
 
 #endif /* LAB1_HEADER_H*/
 

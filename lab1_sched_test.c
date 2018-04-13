@@ -40,8 +40,10 @@ int main(int argc, char *argv[]){
 	Queue schedQ;
 	qInit(&schedQ);
 	
-	qData task1[]={{'A', 0, 7},{'B', 2, 10},{'C',4,3},{'D',6,5},{'E',8,2}};
+	qData task1[]={{'A', 0, 7},{'B', 2, 10},{'C',4,3},{'D',6,5},{'E',8,2},{'F',1,4}};
 	qData2 task2[] = {{'A',0,7},{'B',2,10},{'C',4,3},{'D',6,5},{'E',8,2}};
+	
+	int numOfTask = 6;
 
 	printf("made by \tNam Hye Min\n\t\tYoon Han Sol\n\n");
 	FCFS(task2);
@@ -51,17 +53,17 @@ int main(int argc, char *argv[]){
 	Round_Robin(task2, 4);
 	chart();
 	printf("============== SJF ==================\n");
-	SJF(task1, 5, &schedQ);
-	printChart(&schedQ);
+	SJF(task1, numOfTask, &schedQ);
+	printChart(&schedQ, numOfTask);
 	printf("\n============== MLFQ(q = 1) ==============\n");
-	MLFQ2(task1, 5, 1, &schedQ);
-	printChart(&schedQ);
+	MLFQ2(task1, numOfTask, 1, &schedQ);
+	printChart(&schedQ, numOfTask);
 	printf("\n============== MLFQ(q = 2^n) ==============\n");
-	MLFQ2(task1, 5, 2, &schedQ);
-	printChart(&schedQ);
+	MLFQ2(task1, numOfTask, 2, &schedQ);
+	printChart(&schedQ, numOfTask);
 	printf("\n============== Lottery ==============\n");
-	lottery(task1, 5, &schedQ);
-	printChart(&schedQ);
+	lottery(task1, numOfTask, &schedQ);
+	printChart(&schedQ, numOfTask);
 	
 
 	return 0;
