@@ -1,8 +1,8 @@
 /*
  *	DKU Operating System Lab
  *	    Lab1 (Scheduler Algorithm Simulator)
- *	    Student id : 32131728
- *	    Student name : Yoon Han Sol 
+ *	    Student id : 32131728, 32131698
+ *	    Student name : Yoon Han Sol , Nam Hye Min
  *
  *   lab1_sched.c :
  *       - Lab1 source file.
@@ -25,12 +25,158 @@
 #include <assert.h>
 #include <pthread.h>
 #include <asm/unistd.h>
+#include <stdbool.h>
 
 #include "lab1_sched_types.h"
 
 /*
  * you need to implement FCFS, RR, SPN, SRT, HRRN, MLFQ scheduler. 
  */
+
+// static variable
+int at[Taskss], st[Taskss], rq[50] = { 0, },stm[50] = { 0, };
+int node = 0;
+
+void swap(struct qData *a, struct qData *b)
+{
+	struct qData task;
+
+	task = *a;
+	*a = *b;
+	*b = task;
+	
+}
+void ATsort(struct qData task[])
+{
+	bool swapped;
+
+	do
+	{
+		swapped = false;
+		for (int count = 0; count<(Taskss - 1); count++)
+		{
+			if (task[count].at>task[count+1].at)
+			{
+				swap(&task[count], &task[count + 1]);
+				swapped = true;
+			}
+		}
+	} while (swapped);
+}
+void FCFS(struct qData *task)
+{
+	int x, y;
+
+	ATsort(task);
+
+	printf("==================FCFS================== \n");
+
+	for (x = 0; x < Taskss; x++)
+	{
+		for (y = 0; y < task[x].st; y++)
+		{
+			printf("%c ", task[x].name);
+		}
+	}
+	printf("\n\n");
+}
+
+// RR use SeachStack,AddQue
+void Round_Robin(struct qData *task,int qt){
+	
+	struct qData temp[Taskss];
+	int servicetime;
+	int time = 0;
+	int pnt = 0; //pnt = process name table, 0~1 = A ~ E 
+	int flag=0;
+
+	memcpy(temp, task, sizeof(struct qData)*Taskss);
+
+	printf("================RRwithTQ(%d)================= \n",qt);
+
+	for (int x = 0; x<Taskss; x++) {
+		at[x] = temp[x].at; //at = task's arrival time
+		st[x] = temp[x].st; //st = task's service time
+		stm[x] = temp[x].st; //stm = service time management
+	}
+	do {
+		if (flag == 0) {
+			servicetime = at[0];
+			//---Reduce service time
+			if (stm[0] <= qt) {
+				time = servicetime + stm[0];
+				stm[0] = 0;
+				SearchStack01(pnt, time);
+			}
+			else {
+				stm[0] = stm[0] - qt;
+				time = servicetime + qt;
+				SearchStack01(pnt, time); 
+				AddQue(pnt);
+			}
+		}//if
+		else {
+			pnt = rq[0] - 1; //rq = reday Que
+			servicetime = time;
+			//---DeleteQue
+			for (int x = 0; x<node && node != 1; x++) {
+				rq[x] = rq[x + 1];
+			}
+			node--;
+			//---Reduce service time
+			if (stm[pnt] <= qt) {
+				time = servicetime + stm[pnt];
+				stm[pnt] = 0;
+				SearchStack02(pnt, time);
+			}
+			else {
+				stm[pnt] = stm[pnt] - qt;
+				time = servicetime + qt;
+				SearchStack02(pnt, time);
+				AddQue(pnt);
+			}
+		}//else
+		
+		flag++;
+		
+		for (int i=0; i < qt; i++)
+		{
+			temp[pnt].st--;
+			if(temp[pnt].st >= 0)
+			printf("%c ", temp[pnt].name);
+		}
+		
+	} while (node != 0);
+	printf("\n\n");
+}
+void SearchStack01(int pnt, int time) {
+	for (int x = pnt + 1; x<5; x++) {
+		if (at[x] <= time) {
+			rq[node] = x + 1;
+			node++;
+		}
+	}
+}
+void SearchStack02(int pnt, int time) {
+	for (int x = pnt + 1; x<5; x++) {
+		//---CheckQue
+		int fl = 0;
+		for (int y = 0; y<node; y++) {
+			if (rq[y] == x + 1) {
+				fl++;
+			}
+		}
+		if (at[x] <= time && fl == 0 && stm[x] != 0) {
+			rq[node] = x + 1;
+			node++;
+		}
+	}
+}
+void AddQue(int pnt) {
+	rq[node] = pnt + 1;
+	node++;
+}
+
 
 void qInit(Queue *q)
 {
@@ -223,6 +369,7 @@ void SJF(qData task[], int numOfTask)
 
 void RR(qData task[], int numOfTask)
 {
+	
 	int i,j;
 	int totalServiceTime = getTotalServiceTime(task, numOfTask);
 
@@ -247,6 +394,8 @@ void RR(qData task[], int numOfTask)
 
 void RRwithTQ(qData task[], int numOfTask, int timeQuantum)
 {
+	printf("================RRwithTQ(%d)================= \n",timeQuantum);
+
 	int i,j;
 	int totalServiceTime = getTotalServiceTime(task, numOfTask);
 
@@ -353,6 +502,8 @@ Task* LVote(Lottery *l)
 
 void lottery(Task task[], int numOfTask)
 {
+
+	printf("==================lottery================== \n");
 	int i, j;
 
 	srand(time(NULL));
@@ -383,6 +534,7 @@ void lottery(Task task[], int numOfTask)
 
 void MLFQ(Task task[], int numOfTask)
 {
+	printf("==================MLFQ================== \n");
 	int i,j;
 	Queue q1, q2, q3;
 	qInit(&q1);
@@ -460,6 +612,7 @@ int getLimitProcTime(int qNum, int tq)
 
 void MLFQ2(Task task[], int numOfTask, int tq)
 {
+	printf("==================MLFQ2================== \n");	
 	int i,j;
 	Queue q1, q2, q3;
 	qInit(&q1);

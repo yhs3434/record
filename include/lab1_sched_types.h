@@ -22,6 +22,16 @@
 #define FALSE 0
 
 #define MAX 100
+#define Taskss 5
+
+// struct
+struct qData {
+	char name;
+	int at;
+	int st;
+	};
+struct qData* temp;
+
 
 typedef struct _data{
     char name;
@@ -62,6 +72,16 @@ enum _q
 {
 	_noQ, _q1, _q2, _q3
 };
+
+void swap(struct qData *a, struct qData *b);
+void ATsort(struct qData task[]);
+void FCFS(struct qData *task);
+
+void Round_Robin(struct qData *task, int qt);
+void SearchStack01(int pnt, int tm);
+void SearchStack02(int pnt, int tm);
+void AddQue(int pnt);
+
 
 void qInit(Queue *q);
 void qPush(Queue *q, qData data);

@@ -25,6 +25,7 @@
 #include <assert.h>
 #include <pthread.h>
 #include <asm/unistd.h>
+#include <stdbool.h>
 
 #include "lab1_sched_types.h"
 
@@ -38,10 +39,22 @@ int main(int argc, char *argv[]){
 	qInit(&q);
 	qData taskArr[]={{'A', 0, 3},{'B', 2, 6},{'C',4,4},{'D',6,5},{'E',8,2}};
 	
-	//RRwithTQ(taskArr, 5, 1);
-	//lottery(taskArr, 5);
-	//MLFQ(taskArr, 5);
+	struct qData task[Taskss] = { {'A',0,3},{'B',2,6},{'C',4,4},{'D',6,5},{'E',8,2} };
+
+	FCFS(task);
+	Round_Robin(task, 1);
+	Round_Robin(task, 4);
+	printf("==============SJF===============\n");
+	SJF(taskArr, 5);
+	printf("\n");
+	RRwithTQ(taskArr, 5, 1);
+	printf("\n");
+	lottery(taskArr, 5);
+	printf("\n");
+	MLFQ(taskArr, 5);
+	printf("\n");	
 	MLFQ2(taskArr, 5, 2);
+	printf("\n");
 
 	return 0;
 }
