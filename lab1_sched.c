@@ -202,7 +202,7 @@ void Round_Robin(struct _qData *task,int qt){
 
     memcpy(temp, task, sizeof(struct _qData)*Taskss);
 
-    printf("================RRwithTQ(%d)================= \n",qt);
+    printf("================RRwithTQ(q = %d)================= \n",qt);
 
     for (int x = 0; x<Taskss; x++) {
 	at[x] = temp[x].at; //at = task's arrival time
@@ -611,6 +611,7 @@ void MLFQ2(Task task[], int numOfTask, int tq, Queue* schedQ)
 	    qNum=_noQ;
 	}
     }
+    printf("\n");
 }
 
 void chartInit(Chart (*chart)[MAX], int row, int column)

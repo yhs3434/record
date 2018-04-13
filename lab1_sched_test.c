@@ -53,13 +53,13 @@ int main(int argc, char *argv[]){
 	printf("============== SJF ==================\n");
 	SJF(task1, 5, &schedQ);
 	printChart(&schedQ);
-	printf("\n============== MLFQ(1) ==============\n");
+	printf("\n============== MLFQ(q = 1) ==============\n");
 	MLFQ2(task1, 5, 1, &schedQ);
 	printChart(&schedQ);
-	printf("\n\n============== MLFQ(2) ==============\n");
+	printf("\n============== MLFQ(q = 2^n) ==============\n");
 	MLFQ2(task1, 5, 2, &schedQ);
 	printChart(&schedQ);
-	printf("\n\n============== Lottery ==============\n");
+	printf("\n============== Lottery ==============\n");
 	lottery(task1, 5, &schedQ);
 	printChart(&schedQ);
 	
