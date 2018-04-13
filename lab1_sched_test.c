@@ -1,8 +1,8 @@
 /*
 *	DKU Operating System Lab
 *	    Lab1 (Scheduler Algorithm Simulator)
-*	    Student id : 
-*	    Student name : 
+*	    Student id : 32131698, 32131728 
+*	    Student name : Nam Hye Min, Yoon Han Sol
 *
 *   lab1_sched.c :
 *       - Lab1 source file.

@@ -1,8 +1,8 @@
 /**
  *	DKU Operating System Lab
  *	    Lab1 (Scheduler Algorithm Simulator)
- *	    Student id : 32131728, 32131698
- *	    Student name : Yoon Han Sol , Nam Hye Min
+ *	    Student id : 32131698, 32131728
+ *	    Student name : Nam Hye Min, Yoon Han Sol
  *
  *   lab1_sched.c :
  *       - Lab1 source file.
@@ -32,6 +32,15 @@
 /*
  * you need to implement FCFS, RR, SPN, SRT, HRRN, MLFQ scheduler. 
  */
+
+
+/**
+* =============================================
+*					      =
+*	made by : 32131698  Nam Hye Min	      =
+*					      =
+* =============================================
+**/
 
 // static variable
 int at[Taskss], st[Taskss], rq[50] = { 0, },stm[50] = { 0, };
@@ -184,6 +193,19 @@ void AddQue(int pnt) {
 
 
 
+
+
+
+
+/**
+* =============================================
+*					      =
+*	made by : 32131728  Yoon Han Sol      =
+*					      =
+* =============================================
+**/	
+
+
 void qInit(Queue *q)
 {
     q->numOfData = 0;
@@ -292,7 +314,6 @@ int checkNull(qData x)
 void SJF(qData task[], int numOfTask, Queue *schedQ)
 {
     int i, j;
-    // int n;
 
     qData nullData = qNull();
     qData procTask = nullData;
