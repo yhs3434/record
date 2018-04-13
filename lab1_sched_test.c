@@ -40,9 +40,9 @@ int main(int argc, char *argv[]){
 	Queue schedQ;
 	qInit(&schedQ);
 	
-	qData task1[]={{'A', 0, 7},{'B', 2, 10},{'C',4,3},{'D',6,5},{'E',8,2},{'F',1,4}};
+	qData task1[]={{'A', 1, 1},{'B', 5, 2},{'C',9,7},{'D',9,5},{'E',10,6},{'F',10,4}};
 		
-	int numOfTask = 6;
+	int numOfTask = Taskss;
 
 	printf("made by \tNam Hye Min\n\t\tYoon Han Sol\n\n");
 	FCFS(task1, numOfTask, &schedQ);

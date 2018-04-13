@@ -90,7 +90,7 @@ qData qNull();
 int checkNull(qData x);
 
 void sjfPush(Queue *q, qData data);
-int getTotalServiceTime(qData* task, int numOfTask);
+int totalServiceTime(qData* task, int numOfTask);
 
 //void quickSort(qData **x, int left, int right);
 //void sort(qData** task, int numOfTask);

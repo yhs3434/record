@@ -298,9 +298,19 @@ int checkNull(qData x)
 	return FALSE;
 }
 
+int totalServiceTime(qData* task, int numOfTask)
+{
+    int sum=0;
+    int i;
+    for(i=0; i<numOfTask; i++)
+	sum+=task[i].serviceTime;
+    return sum;
+}
+
 void SJF(qData task[], int numOfTask, Queue *schedQ)
 {
     int i, j;
+    int count = totalServiceTime(task, numOfTask);
 
     qData nullData = qNull();
     qData procTask = nullData;
@@ -308,7 +318,7 @@ void SJF(qData task[], int numOfTask, Queue *schedQ)
     Queue q;
     qInit(&q);
 
-    for(i=0;i<MAX;i++){
+    for(i=0;count;i++){
 	for(j=0;j<numOfTask;j++){
 	    if(task[j].arrivalTime == i){
 		sjfPush(&q, task[j]);
@@ -316,16 +326,20 @@ void SJF(qData task[], int numOfTask, Queue *schedQ)
 	}
 
 	if(checkNull(procTask)){
-	    if(checkNull(procTask = qPop(&q)))
+	    if(checkNull(procTask = qPop(&q))){
+		qPush(schedQ, procTask);
 		continue;
+	    }
 	    printf("%c ", procTask.name);
 	    qPush(schedQ, procTask);
+	    count--;
 	    if(!(--procTask.serviceTime))
 		procTask = nullData;
 	}
 	else{
 	    printf("%c ", procTask.name);
 	    qPush(schedQ, procTask);
+	    count--;
 	    if(!(--procTask.serviceTime))
 		procTask = nullData;
 	}
@@ -401,7 +415,8 @@ Task* LVote(Lottery *l)
 void lottery(Task task[], int numOfTask, Queue* schedQ)
 {
     int i, j;
-
+    int count = totalServiceTime(task, numOfTask);
+    
     srand(time(NULL));
 
     Lottery l;
@@ -410,18 +425,19 @@ void lottery(Task task[], int numOfTask, Queue* schedQ)
     Task nullData = qNull();
     Task *procTask = &nullData;
 
-    for(i=0;i<MAX;i++){
+    for(i=0;count;i++){
 	for(j=0;j<numOfTask;j++){
 	    if(task[j].arrivalTime == i){
 		LInsert(&l, task[j]);
 	    }
 	}
-	if(!l.numOfProcess)
+	if(!l.numOfProcess){
+	    qPush(schedQ, *procTask);
 	    continue;
+	}
 	procTask=LVote(&l);
-	if(checkNull(*procTask))
-	    continue;
 	printf("%c ",procTask->name);
+	count--;
 	qPush(schedQ, *procTask);
 	if(!(--procTask->serviceTime))
 	    LDelete(&l, *procTask);
@@ -444,6 +460,8 @@ int getLimitProcTime(int qNum, int tq)
 void MLFQ2(Task task[], int numOfTask, int tq, Queue* schedQ)
 {
     int i,j;
+    int count = totalServiceTime(task, numOfTask);
+
     Queue q1, q2, q3;
     qInit(&q1);
     qInit(&q2);
@@ -455,7 +473,7 @@ void MLFQ2(Task task[], int numOfTask, int tq, Queue* schedQ)
     int qNum = _noQ;
     int checkNextArrival;
 
-    for(i=0; i<MAX;i++){
+    for(i=0; count;i++){
 	for(j=0; j<numOfTask; j++){
 	    if(task[j].arrivalTime == i){
 		qPush(&q1, task[j]);
@@ -466,6 +484,7 @@ void MLFQ2(Task task[], int numOfTask, int tq, Queue* schedQ)
 	    if(checkNull(procTask=qPop(&q1))){
 		if(checkNull(procTask=qPop(&q2))){
 		    if(checkNull(procTask=qPop(&q3))){
+			qPush(schedQ, procTask);
 			continue;
 		    }else{ qNum=_q3; }
 		}else{ qNum=_q2; }
@@ -475,6 +494,7 @@ void MLFQ2(Task task[], int numOfTask, int tq, Queue* schedQ)
 	printf("%c ", procTask.name);
 	qPush(schedQ, procTask);
 	procTime++;
+	count--;
 
 	if(!(--procTask.serviceTime)){
 	    procTask = nullData;
@@ -532,7 +552,8 @@ void chartPush(Chart (*chart)[MAX], char process, int index, int numOfTask)
 	    break;
 	}
     }
-
+    if(row>=numOfTask)
+	return;
     chart[row][index].check = TRUE;
 }
 
