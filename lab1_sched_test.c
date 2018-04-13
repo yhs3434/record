@@ -51,7 +51,7 @@ int main(int argc, char *argv[]){
 	printChart(&schedQ, numOfTask);
 	Round_Robin(task1, numOfTask, 4, &schedQ);
 	printChart(&schedQ, numOfTask);
-	printf("============== SJF ==================\n");
+	printf("\n============== SJF ==================\n");
 	SJF(task1, numOfTask, &schedQ);
 	printChart(&schedQ, numOfTask);
 	printf("\n============== MLFQ(q = 1) ==============\n");

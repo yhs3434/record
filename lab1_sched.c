@@ -79,9 +79,7 @@ void FCFS(qData *task, int numOfTask, Queue* schedQ)
 
     ATsort(task, numOfTask);
 
-    arrinit();
-
-    printf("==================FCFS================== \n");
+    printf("\n==================FCFS================== \n");
 
     for (x = 0; x < numOfTask; x++)
     {
@@ -89,11 +87,9 @@ void FCFS(qData *task, int numOfTask, Queue* schedQ)
 	{
 	    printf("%c ", task[x].name);
 	    qPush(schedQ, task[x]);
-	    arr[num] = task[x].name;
-	    num++;
 	}
     }
-    printf("\n\n");
+    printf("\n");
 }
 
 // RR use SeachStack,AddQue
@@ -104,11 +100,9 @@ void Round_Robin(qData *task, int numOfTask, int qt, Queue* schedQ){
     int pnt = 0; //pnt = process name table, 0~1 = A ~ E 
     int flag=0;
 
-    arrinit();
-
     memcpy(temp, task, sizeof(qData)*numOfTask);
 
-    printf("================RRwithTQ(q = %d)================= \n",qt);
+    printf("\n================RRwithTQ(q = %d)================= \n",qt);
 
     for (int x = 0; x<numOfTask; x++) {
 	at[x] = temp[x].arrivalTime; //arrivalTime = task's arrival time
@@ -161,13 +155,11 @@ void Round_Robin(qData *task, int numOfTask, int qt, Queue* schedQ){
 	    if(temp[pnt].serviceTime >= 0){
 		printf("%c ", temp[pnt].name);
 		qPush(schedQ, temp[pnt]);
-		arr[num] = temp[pnt].name;
-		num++;
 	    }
 	}
 
     } while (node != 0);
-    printf("\n\n");
+    printf("\n");
 }
 
 void SearchStack01(int pnt, int time, int numOfTask) {
