@@ -25,13 +25,13 @@
 #define Taskss 5
 
 // struct
-struct qData {
+struct _qData {
     char name;
     int at;
     int st;
 };
-struct qData* temp;
-
+struct _qData* temp;
+typedef struct _qData qData2;
 
 typedef struct _data{
     char name;
@@ -68,16 +68,20 @@ typedef struct _lottery{
     LNode *tail;
 }Lottery;
 
+typedef struct _chart{
+    int check;
+}Chart;
+
 enum _q
 {
     _noQ, _q1, _q2, _q3
 };
 
-void swap(struct qData *a, struct qData *b);
-void ATsort(struct qData task[]);
-void FCFS(struct qData *task);
+void swap(struct _qData *a, struct _qData *b);
+void ATsort(struct _qData task[]);
+void FCFS(struct _qData *task);
 
-void Round_Robin(struct qData *task, int qt);
+void Round_Robin(struct _qData *task, int qt);
 void SearchStack01(int pnt, int tm);
 void SearchStack02(int pnt, int tm);
 void AddQue(int pnt);
@@ -89,12 +93,14 @@ qData qPop(Queue *q);
 int qIsEmpty(Queue *q);
 qData qNull();
 int checkNull(qData x);
+
 void sjfPush(Queue *q, qData data);
 int getTotalServiceTime(qData* task, int numOfTask);
-void quickSort(qData **x, int left, int right);
-void sort(qData** task, int numOfTask);
 
-void SJF(qData task[], int numOfTask);
+//void quickSort(qData **x, int left, int right);
+//void sort(qData** task, int numOfTask);
+
+void SJF(qData task[], int numOfTask, Queue* schedQ);
 // void RR(qData task[], int numOfTask);
 void RRwithTQ(qData task[], int numOfTask, int timeQuantum);
 
@@ -102,11 +108,13 @@ void LInit(Lottery *l);
 void LInsert(Lottery *l, Task task);
 Task LDelete(Lottery *l, Task task);
 Task* LVote(Lottery *l);
-void lottery(Task task[], int numOfTask);
+void lottery(Task task[], int numOfTask, Queue* schedQ);
 
 int getLimitProcTime(int qNum, int tq);
 // void MLFQ(Task task[], int numOfTask);
-void MLFQ2(Task task[], int numOfTask, int tq);
+void MLFQ2(Task task[], int numOfTask, int tq, Queue* schedQ);
+
+void printChart(Queue* schedQ);
 
 #endif /* LAB1_HEADER_H*/
 

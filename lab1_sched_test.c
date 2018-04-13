@@ -37,24 +37,27 @@
 int main(int argc, char *argv[]){
     	Queue q;
 	qInit(&q);
-	qData taskArr[]={{'A', 0, 3},{'B', 2, 6},{'C',4,4},{'D',6,5},{'E',8,2}};
+	Queue schedQ;
+	qInit(&schedQ);
 	
-	struct qData task[Taskss] = { {'A',0,3},{'B',2,6},{'C',4,4},{'D',6,5},{'E',8,2} };
+	qData task1[]={{'A', 0, 3},{'B', 2, 6},{'C',4,4},{'D',6,5},{'E',8,2}};
+	qData2 task2[] = {{'A',0,3},{'B',2,6},{'C',4,4},{'D',6,5},{'E',8,2} };
 
-	FCFS(task);
-	Round_Robin(task, 1);
-	Round_Robin(task, 4);
+	FCFS(task2);
+	Round_Robin(task2, 1);
+	Round_Robin(task2, 4);
 	printf("============== SJF ==================\n");
-	SJF(taskArr, 5);
-	// RRwithTQ(taskArr, 5, 1);
-	// printf("\n");
+	SJF(task1, 5, &schedQ);
+	printChart(&schedQ);
 	printf("\n============== MLFQ(1) ==============\n");
-	MLFQ2(taskArr, 5, 1);
-	
+	MLFQ2(task1, 5, 1, &schedQ);
+	printChart(&schedQ);
 	printf("\n\n============== MLFQ(2) ==============\n");
-	MLFQ2(taskArr, 5, 2);
+	MLFQ2(task1, 5, 2, &schedQ);
+	printChart(&schedQ);
 	printf("\n\n============== Lottery ==============\n");
-	lottery(taskArr, 5);
+	lottery(task1, 5, &schedQ);
+	printChart(&schedQ);
 	
 
 	return 0;

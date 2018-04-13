@@ -1,4 +1,4 @@
-/*
+/**
  *	DKU Operating System Lab
  *	    Lab1 (Scheduler Algorithm Simulator)
  *	    Student id : 32131728, 32131698
@@ -37,17 +37,16 @@
 int at[Taskss], st[Taskss], rq[50] = { 0, },stm[50] = { 0, };
 int node = 0;
 
-void swap(struct qData *a, struct qData *b)
+void swap(struct _qData *a, struct _qData *b)
 {
-    struct qData task;
+    struct _qData task;
 
     task = *a;
     *a = *b;
     *b = task;
-
 }
 
-void ATsort(struct qData task[])
+void ATsort(struct _qData task[])
 {
     bool swapped;
 
@@ -65,7 +64,7 @@ void ATsort(struct qData task[])
     } while (swapped);
 }
 
-void FCFS(struct qData *task)
+void FCFS(struct _qData *task)
 {
     int x, y;
 
@@ -84,15 +83,15 @@ void FCFS(struct qData *task)
 }
 
 // RR use SeachStack,AddQue
-void Round_Robin(struct qData *task,int qt){
+void Round_Robin(struct _qData *task,int qt){
 
-    struct qData temp[Taskss];
+    struct _qData temp[Taskss];
     int servicetime;
     int time = 0;
     int pnt = 0; //pnt = process name table, 0~1 = A ~ E 
     int flag=0;
 
-    memcpy(temp, task, sizeof(struct qData)*Taskss);
+    memcpy(temp, task, sizeof(struct _qData)*Taskss);
 
     printf("================RRwithTQ(%d)================= \n",qt);
 
@@ -144,8 +143,9 @@ void Round_Robin(struct qData *task,int qt){
 	for (int i=0; i < qt; i++)
 	{
 	    temp[pnt].st--;
-	    if(temp[pnt].st >= 0)
+	    if(temp[pnt].st >= 0){
 		printf("%c ", temp[pnt].name);
+	    }
 	}
 
     } while (node != 0);
@@ -272,39 +272,6 @@ int getTotalServiceTime(qData* task, int numOfTask)
     return min + total;
 }
 
-void quickSort(qData **x, int left, int right)
-{
-    int i=left;
-    int j=right;
-    int pivot = (*x)[(left+right)/2].serviceTime;
-    qData temp;
-
-    while(i<=j){
-	while((*x)[i].serviceTime < pivot)
-	    i++;
-	while((*x)[j].serviceTime > pivot)
-	    j--;
-
-	if(i<=j){
-	    temp=(*x)[i];
-	    (*x)[i]=(*x)[j];
-	    (*x)[j]=temp;
-	    i++;
-	    j--;
-	}
-    }
-
-    if(left < j)
-	quickSort(x, left, j);
-    if(i < right)
-	quickSort(x, i, right);
-}
-
-void sort(qData** task, int numOfTask)
-{
-    quickSort(task, 0, numOfTask-1);
-}
-
 qData qNull()
 {
     qData nullData;
@@ -322,7 +289,7 @@ int checkNull(qData x)
 	return FALSE;
 }
 
-void SJF(qData task[], int numOfTask)
+void SJF(qData task[], int numOfTask, Queue *schedQ)
 {
     int i, j;
     // int n;
@@ -342,30 +309,16 @@ void SJF(qData task[], int numOfTask)
 	    }
 	}
 
-	/*
-	   n = 0;
-	   for(j=0;j<numOfTask;j++)
-	   if(task[j].arrivalTime == i)
-	   n++;
-	   if(!n){}
-	   else{
-	   sort(&task, numOfTask);
-	   for(j=0; j<numOfTask; j++){
-	   if(task[j].arrivalTime == i && task[j].serviceTime){
-	   qPush(&q, task[j]);
-	   }
-	   }
-	   }
-	 */ // Amendded prev version
-
 	if(checkNull(procTask)){
 	    procTask = qPop(&q);
 	    printf("%c ", procTask.name);
+	    qPush(schedQ, procTask);
 	    if(!(--procTask.serviceTime))
 		procTask = nullData;
 	}
 	else{
 	    printf("%c ", procTask.name);
+	    qPush(schedQ, procTask);
 	    if(!(--procTask.serviceTime))
 		procTask = nullData;
 	}
@@ -479,7 +432,7 @@ Task* LVote(Lottery *l)
     return &(cur->task);
 }	
 
-void lottery(Task task[], int numOfTask)
+void lottery(Task task[], int numOfTask, Queue* schedQ)
 {
     int i, j;
 
@@ -503,6 +456,7 @@ void lottery(Task task[], int numOfTask)
 	if(checkNull(*procTask))
 	    continue;
 	printf("%c ",procTask->name);
+	qPush(schedQ, *procTask);
 	if(!(--procTask->serviceTime))
 	    LDelete(&l, *procTask);
     }
@@ -521,7 +475,7 @@ int getLimitProcTime(int qNum, int tq)
 	return FALSE;
 }
 
-void MLFQ2(Task task[], int numOfTask, int tq)
+void MLFQ2(Task task[], int numOfTask, int tq, Queue* schedQ)
 {
     int i,j;
     Queue q1, q2, q3;
@@ -553,6 +507,7 @@ void MLFQ2(Task task[], int numOfTask, int tq)
 	}
 
 	printf("%c ", procTask.name);
+	qPush(schedQ, procTask);
 	procTime++;
 
 	if(!(--procTask.serviceTime)){
@@ -588,6 +543,57 @@ void MLFQ2(Task task[], int numOfTask, int tq)
 	    procTime = 0;
 	    qNum=_noQ;
 	}
+    }
+    printf("\n");
+}
 
+void chartInit(Chart (*chart)[MAX], int row, int column)
+{
+    int i,j;
+    for(i=0; i<row; i++){
+	for(j=0; j<column; j++){
+	    chart[i][j].check = FALSE;
+	}
+    }
+}
+
+void chartPush(Chart (*chart)[MAX], char process, int index)
+{
+    int row;
+    if(process == 'A')
+	row=0;
+    else if(process == 'B')
+	row=1;
+    else if(process == 'C')
+	row=2;
+    else if(process == 'D')
+	row=3;
+    else
+	row=4;
+
+    chart[row][index].check = TRUE;
+}
+
+void printChart(Queue* schedQ)
+{
+    int i, j;
+    Chart chart[5][MAX];
+    chartInit(chart, 5, MAX);
+    char process;
+    printf("\nChart\n");
+    int index = 0;
+    while(!qIsEmpty(schedQ)){
+	process = qPop(schedQ).name;
+	chartPush(chart, process, index);
+	index++;
+    }
+    for(i=0; i<5; i++){
+	for(j=0; j<index; j++){
+	    if(chart[i][j].check)
+		printf("■ ");
+	    else
+		printf("□ ");
+	}
+	printf("\n");
     }
 }
