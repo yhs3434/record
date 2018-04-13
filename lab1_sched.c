@@ -216,12 +216,12 @@ void Round_Robin(qData *task, int numOfTask, int qt, Queue* schedQ){
 	    if (stm[0] <= qt) {
 		time = servicetime + stm[0];
 		stm[0] = 0;
-		SearchStack01(pnt, time);
+		SearchStack01(pnt, time, numOfTask);
 	    }
 	    else {
 		stm[0] = stm[0] - qt;
 		time = servicetime + qt;
-		SearchStack01(pnt, time); 
+		SearchStack01(pnt, time, numOfTask); 
 		AddQue(pnt);
 	    }
 	}//if
@@ -237,12 +237,12 @@ void Round_Robin(qData *task, int numOfTask, int qt, Queue* schedQ){
 	    if (stm[pnt] <= qt) {
 		time = servicetime + stm[pnt];
 		stm[pnt] = 0;
-		SearchStack02(pnt, time);
+		SearchStack02(pnt, time, numOfTask);
 	    }
 	    else {
 		stm[pnt] = stm[pnt] - qt;
 		time = servicetime + qt;
-		SearchStack02(pnt, time);
+		SearchStack02(pnt, time, numOfTask);
 		AddQue(pnt);
 	    }
 	}//else
@@ -264,8 +264,8 @@ void Round_Robin(qData *task, int numOfTask, int qt, Queue* schedQ){
     printf("\n\n");
 }
 
-void SearchStack01(int pnt, int time) {
-    for (int x = pnt + 1; x<5; x++) {
+void SearchStack01(int pnt, int time, int numOfTask) {
+    for (int x = pnt + 1; x<numOfTask; x++) {
 	if (at[x] <= time) {
 	    rq[node] = x + 1;
 	    node++;
@@ -273,8 +273,8 @@ void SearchStack01(int pnt, int time) {
     }
 }
 
-void SearchStack02(int pnt, int time) {
-    for (int x = pnt + 1; x<5; x++) {
+void SearchStack02(int pnt, int time, int numOfTask) {
+    for (int x = pnt + 1; x<numOfTask; x++) {
 	//---CheckQue
 	int fl = 0;
 	for (int y = 0; y<node; y++) {
