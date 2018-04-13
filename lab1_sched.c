@@ -43,7 +43,7 @@
  **/
 
 // static variable
-int at[Taskss], st[Taskss], rq[50] = { 0, },stm[50] = { 0, };
+int at[numOfTask], st[numOfTask], rq[50] = { 0, },stm[50] = { 0, };
 int node = 0;
 int arr[20];
 int num = 0;
@@ -156,7 +156,7 @@ void ATsort(qData task[])
     do
     {
 	swapped = false;
-	for (int count = 0; count<(Taskss - 1); count++)
+	for (int count = 0; count<(numOfTask - 1); count++)
 	{
 	    if (task[count].arrivalTime>task[count+1].arrivalTime)
 	    {
@@ -167,7 +167,7 @@ void ATsort(qData task[])
     } while (swapped);
 }
 
-void FCFS(qData *task, Queue* schedQ)
+void FCFS(qData *task, int numOfTask, Queue* schedQ)
 {
     int x, y;
 
@@ -177,7 +177,7 @@ void FCFS(qData *task, Queue* schedQ)
 
     printf("==================FCFS================== \n");
 
-    for (x = 0; x < Taskss; x++)
+    for (x = 0; x < numOfTask; x++)
     {
 	for (y = 0; y < task[x].serviceTime; y++)
 	{
@@ -191,8 +191,8 @@ void FCFS(qData *task, Queue* schedQ)
 }
 
 // RR use SeachStack,AddQue
-void Round_Robin(qData *task,int qt, Queue* schedQ){
-    qData temp[Taskss];
+void Round_Robin(qData *task, int numOfTask, int qt, Queue* schedQ){
+    qData temp[numOfTask];
     int servicetime;
     int time = 0;
     int pnt = 0; //pnt = process name table, 0~1 = A ~ E 
@@ -200,11 +200,11 @@ void Round_Robin(qData *task,int qt, Queue* schedQ){
 
     arrinit();
 
-    memcpy(temp, task, sizeof(qData)*Taskss);
+    memcpy(temp, task, sizeof(qData)*numOfTask);
 
     printf("================RRwithTQ(q = %d)================= \n",qt);
 
-    for (int x = 0; x<Taskss; x++) {
+    for (int x = 0; x<numOfTask; x++) {
 	at[x] = temp[x].arrivalTime; //arrivalTime = task's arrival time
 	st[x] = temp[x].serviceTime; //serviceTime = task's service time
 	stm[x] = temp[x].serviceTime; //stm = service time management

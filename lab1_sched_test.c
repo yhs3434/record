@@ -45,11 +45,11 @@ int main(int argc, char *argv[]){
 	int numOfTask = 6;
 
 	printf("made by \tNam Hye Min\n\t\tYoon Han Sol\n\n");
-	FCFS(task1, &schedQ);
+	FCFS(task1, numOfTask, &schedQ);
 	printChart(&schedQ, numOfTask);
-	Round_Robin(task1, 1, &schedQ);
+	Round_Robin(task1, numOfTask, 1, &schedQ);
 	printChart(&schedQ, numOfTask);
-	Round_Robin(task1, 4, &schedQ);
+	Round_Robin(task1, numOfTask, 4, &schedQ);
 	printChart(&schedQ, numOfTask);
 	printf("============== SJF ==================\n");
 	SJF(task1, numOfTask, &schedQ);
