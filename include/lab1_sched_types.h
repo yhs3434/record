@@ -21,8 +21,12 @@
 #define TRUE 1
 #define FALSE 0
 
+// Taskss를 태스크 숫자랑 맞춰주어야 합니다.
+#define Taskss 10
+// *************
+
+
 #define MAX 100
-#define Taskss 6
 
 typedef struct _data{
     char name;
@@ -110,7 +114,7 @@ int getLimitProcTime(int qNum, int tq);
 void allTask2HighestPriority(Queue* q1, Queue* q2, Queue* q3);
 void MLFQ2(Task task[], int numOfTask, int tq, Queue* schedQ);
 
-void printChart(Queue* schedQ, int numOfTask);
+void printChart(Task task[], Queue* schedQ, int numOfTask);
 
 #endif /* LAB1_HEADER_H*/
 

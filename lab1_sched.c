@@ -99,7 +99,7 @@ void Round_Robin(qData task[], int numOfTask, int qt, Queue* schedQ){
     int time = 0;
     int pnt = 0; //pnt = process name table, 0~1 = A ~ E 
     int flag=0;
-    
+
     ATsort(task, numOfTask);
 
     memcpy(temp, task, sizeof(qData)*numOfTask);
@@ -418,7 +418,7 @@ void lottery(Task task[], int numOfTask, Queue* schedQ)
 {
     int i, j;
     int count = totalServiceTime(task, numOfTask);
-    
+
     srand(time(NULL));
 
     Lottery l;
@@ -560,7 +560,7 @@ void chartInit(Chart (*chart)[MAX], int row, int column)
     }
 }
 
-void chartPush(Chart (*chart)[MAX], char process, int index, int numOfTask)
+void chartPush(Chart (*chart)[MAX], char process, int index, int numOfTask,int* startTime, int* endTime)
 {
     int row;
 
@@ -572,11 +572,26 @@ void chartPush(Chart (*chart)[MAX], char process, int index, int numOfTask)
     if(row>=numOfTask)
 	return;
     chart[row][index].check = TRUE;
+    endTime[row] = index;
+    if(startTime[row]==-1)
+	startTime[row] = index;
 }
 
-void printChart(Queue* schedQ, int numOfTask)
+void startTimeInit(int *st, int length)
+{
+    int i;
+    for(i=0;i<length;i++)
+	st[i]=-1;
+}
+
+void printChart(Task task[], Queue* schedQ, int numOfTask)
 {
     int i, j;
+    double TT, RT;
+    int sum1 = 0, sum2 = 0;
+    int endTime[numOfTask];
+    int startTime[numOfTask];
+    startTimeInit(startTime, numOfTask);
     Chart chart[numOfTask][MAX];
     chartInit(chart, numOfTask, MAX);
     char process;
@@ -584,7 +599,7 @@ void printChart(Queue* schedQ, int numOfTask)
     int index = 0;
     while(!qIsEmpty(schedQ)){
 	process = qPop(schedQ).name;
-	chartPush(chart, process, index, numOfTask);
+	chartPush(chart, process, index, numOfTask, startTime, endTime);
 	index++;
     }
     for(i=0; i<numOfTask; i++){
@@ -597,4 +612,14 @@ void printChart(Queue* schedQ, int numOfTask)
 	}
 	printf("\n");
     }
+    int temp;
+    for(i=0; i<numOfTask; i++){
+	temp = task[i].arrivalTime;
+	sum1+=(endTime[i] - temp);
+	sum2+=(startTime[i] - temp);
+    }
+    TT = (double)sum1 / numOfTask;
+    RT = (double)sum2 / numOfTask;
+    printf("TT = %.2f\t\tRT = %.2f\n",TT, RT);
 }
+
