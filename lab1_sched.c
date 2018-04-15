@@ -55,7 +55,7 @@ void swap(qData *a, qData *b)
     *b = task;
 }
 
-void ATsort(qData task[], int numOfTask)
+void ATsort(qData* task, int numOfTask)
 {
     bool swapped;
 
@@ -73,7 +73,7 @@ void ATsort(qData task[], int numOfTask)
     } while (swapped);
 }
 
-void FCFS(qData *task, int numOfTask, Queue* schedQ)
+void FCFS(qData task[], int numOfTask, Queue* schedQ)
 {
     int x, y;
 
@@ -93,12 +93,14 @@ void FCFS(qData *task, int numOfTask, Queue* schedQ)
 }
 
 // RR use SeachStack,AddQue
-void Round_Robin(qData *task, int numOfTask, int qt, Queue* schedQ){
+void Round_Robin(qData task[], int numOfTask, int qt, Queue* schedQ){
     qData temp[numOfTask];
     int servicetime;
     int time = 0;
     int pnt = 0; //pnt = process name table, 0~1 = A ~ E 
     int flag=0;
+    
+    ATsort(task, numOfTask);
 
     memcpy(temp, task, sizeof(qData)*numOfTask);
 

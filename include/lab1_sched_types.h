@@ -70,10 +70,10 @@ enum _q
 };
 
 void swap(qData *a, qData *b);
-void ATsort(qData task[], int numOfTask);
-void FCFS(qData *task, int numOfTask, Queue* schedQ);
+void ATsort(qData* task, int numOfTask);
+void FCFS(qData task[], int numOfTask, Queue* schedQ);
 
-void Round_Robin(qData *task, int numOfTask, int qt, Queue* schedQ);
+void Round_Robin(qData task[], int numOfTask, int qt, Queue* schedQ);
 void SearchStack01(int pnt, int tm, int numOfTask);
 void SearchStack02(int pnt, int tm, int numOfTask);
 void AddQue(int pnt);
