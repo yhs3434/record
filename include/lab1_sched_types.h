@@ -107,6 +107,7 @@ void lottery(Task task[], int numOfTask, Queue* schedQ);
 
 int getLimitProcTime(int qNum, int tq);
 // void MLFQ(Task task[], int numOfTask);
+void allTask2HighestPriority(Queue* q1, Queue* q2, Queue* q3);
 void MLFQ2(Task task[], int numOfTask, int tq, Queue* schedQ);
 
 void printChart(Queue* schedQ, int numOfTask);

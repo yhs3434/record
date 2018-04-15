@@ -457,10 +457,21 @@ int getLimitProcTime(int qNum, int tq)
 	return FALSE;
 }
 
+void allTask2HighestPriority(Queue* q1, Queue* q2, Queue* q3)
+{
+    Task temp;
+    while(!checkNull(temp=qPop(q3)))
+	qPush(q1, temp);
+    while(!checkNull(temp=qPop(q2)))
+	qPush(q1, temp);
+}
+
 void MLFQ2(Task task[], int numOfTask, int tq, Queue* schedQ)
 {
     int i,j;
     int count = totalServiceTime(task, numOfTask);
+    int time2convert = 0;
+    const int limit = 20;
 
     Queue q1, q2, q3;
     qInit(&q1);
@@ -528,6 +539,10 @@ void MLFQ2(Task task[], int numOfTask, int tq, Queue* schedQ)
 	    procTask = nullData;
 	    procTime = 0;
 	    qNum=_noQ;
+	}
+	if(++time2convert>=limit){
+	    allTask2HighestPriority(&q1, &q2, &q3);
+	    time2convert = 0;
 	}
     }
     printf("\n");
