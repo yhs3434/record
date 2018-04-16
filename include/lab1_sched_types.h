@@ -22,7 +22,7 @@
 #define FALSE 0
 
 // Taskss를 태스크 숫자랑 맞춰주어야 합니다.
-#define Taskss 10
+#define Taskss 5
 // *************
 
 
