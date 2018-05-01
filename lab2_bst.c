@@ -136,29 +136,28 @@ int lab2_node_insert_fg(lab2_tree *tree, lab2_node *new_node){
 	// You need to implement lab2_node_insert_fg function.
 	if(!tree->root){
 		tree->root=new_node;
-		return LAB2_SUCCESS;
 	}
+	else{
+		lab2_node *p_node = NULL, *c_node = tree->root;
 
-	lab2_node *p_node = NULL, *c_node = tree->root;
+		while(c_node){
+			if(new_node -> key == c_node -> key)
+				return LAB2_ERROR;
+			else if(new_node -> key < c_node -> key){
+				p_node = c_node;
+				c_node = c_node -> left;
+			}
+			else{
+				p_node = c_node;
+				c_node = c_node -> right;
+			}
+		}
 
-	while(c_node){
-		if(new_node -> key == c_node -> key)
-			return LAB2_ERROR;
-		else if(new_node -> key < c_node -> key){
-			p_node = c_node;
-			c_node = c_node -> left;
-		}
-		else{
-			p_node = c_node;
-			c_node = c_node -> right;
-		}
+		if(new_node->key < p_node->key)
+			p_node -> left = new_node;
+		else
+			p_node -> right = new_node;
 	}
-
-	if(new_node->key < p_node->key)
-		p_node -> left = new_node;
-	else
-		p_node -> right = new_node;
-
 	return LAB2_SUCCESS;
 }
 
@@ -175,30 +174,30 @@ int lab2_node_insert_cg(lab2_tree *tree, lab2_node *new_node){
 	pthread_mutex_lock(&mutex_global);
 	if(!tree->root){
 		tree->root=new_node;
-		return LAB2_SUCCESS;
+	}
+	else{
+		lab2_node *p_node = NULL, *c_node = tree->root;
+
+		while(c_node){
+			if(new_node -> key == c_node -> key)
+				return LAB2_ERROR;
+			else if(new_node -> key < c_node -> key){
+				p_node = c_node;
+				c_node = c_node -> left;
+			}
+			else{
+				p_node = c_node;
+				c_node = c_node -> right;
+			}
+		}
+
+		if(new_node->key < p_node->key)
+			p_node -> left = new_node;
+		else
+			p_node -> right = new_node;
 	}
 
-	lab2_node *p_node = NULL, *c_node = tree->root;
-
-	while(c_node){
-		if(new_node -> key == c_node -> key)
-			return LAB2_ERROR;
-		else if(new_node -> key < c_node -> key){
-			p_node = c_node;
-			c_node = c_node -> left;
-		}
-		else{
-			p_node = c_node;
-			c_node = c_node -> right;
-		}
-	}
-
-	if(new_node->key < p_node->key)
-		p_node -> left = new_node;
-	else
-		p_node -> right = new_node;
 	pthread_mutex_unlock(&mutex_global);
-
 	return LAB2_SUCCESS;
 }
 
