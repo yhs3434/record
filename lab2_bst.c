@@ -133,6 +133,32 @@ int lab2_node_insert(lab2_tree *tree, lab2_node *new_node){
  */
 int lab2_node_insert_fg(lab2_tree *tree, lab2_node *new_node){
       // You need to implement lab2_node_insert_fg function.
+if(!tree->root){
+		tree->root=new_node;
+		return LAB2_SUCCESS;
+	}
+
+	lab2_node *p_node = NULL, *c_node = tree->root;
+
+	while(c_node){
+		if(new_node -> key == c_node -> key)
+			return LAB2_ERROR;
+		else if(new_node -> key < c_node -> key){
+			p_node = c_node;
+			c_node = c_node -> left;
+		}
+		else{
+			p_node = c_node;
+			c_node = c_node -> right;
+		}
+	}
+
+	if(new_node->key < p_node->key)
+		p_node -> left = new_node;
+	else
+		p_node -> right = new_node;
+
+	return LAB2_SUCCESS;
 }
 
 /* 
@@ -145,6 +171,32 @@ int lab2_node_insert_fg(lab2_tree *tree, lab2_node *new_node){
  */
 int lab2_node_insert_cg(lab2_tree *tree, lab2_node *new_node){
     // You need to implement lab2_node_insert_cg function.
+if(!tree->root){
+		tree->root=new_node;
+		return LAB2_SUCCESS;
+	}
+
+	lab2_node *p_node = NULL, *c_node = tree->root;
+
+	while(c_node){
+		if(new_node -> key == c_node -> key)
+			return LAB2_ERROR;
+		else if(new_node -> key < c_node -> key){
+			p_node = c_node;
+			c_node = c_node -> left;
+		}
+		else{
+			p_node = c_node;
+			c_node = c_node -> right;
+		}
+	}
+
+	if(new_node->key < p_node->key)
+		p_node -> left = new_node;
+	else
+		p_node -> right = new_node;
+
+	return LAB2_SUCCESS;
 }
 
 /* 
@@ -228,6 +280,65 @@ int lab2_node_remove(lab2_tree *tree, int key) {
  */
 int lab2_node_remove_fg(lab2_tree *tree, int key) {
     // You need to implement lab2_node_remove_fg function.
+lab2_node *p_node = NULL;
+	lab2_node *c_node = tree->root;
+
+	while(c_node){
+		if(key == c_node->key)
+			break;
+		else if(key < c_node->key){
+			p_node = c_node;
+			c_node = c_node->left;
+		}else{
+			p_node = c_node;
+			c_node = c_node->right;
+		}
+	}
+	// If tree doesn't have a key
+	if(!c_node)
+		return LAB2_ERROR;
+	
+	if(c_node->left && c_node->right){
+		lab2_node *r_p_node = c_node, *r_c_node = c_node->right;
+		while(r_c_node->left){
+			r_p_node = r_c_node;
+			r_c_node = r_c_node->left;
+		}
+		c_node->key = r_c_node->key;
+		if(r_p_node->right==r_c_node)
+			r_p_node->right=r_c_node->right;
+		else
+			r_p_node->left=r_c_node->right;
+		free(r_c_node);
+	}
+	else if(c_node -> left || c_node->right){
+		if(c_node->left){
+			if(c_node==tree->root)
+				tree->root=c_node->left;
+			else if(p_node->left==c_node)
+				p_node->left=c_node->left;
+			else
+				p_node->right=c_node->left;
+		}else{
+			if(c_node==tree->root)
+				tree->root=c_node->right;
+			else if(p_node->left==c_node)
+				p_node->left=c_node->right;
+			else
+				p_node->right=c_node->right;
+		}
+		free(c_node);
+	}else{
+		if(c_node==tree->root)
+			tree->root=NULL;
+		else if(p_node->left==c_node)
+			p_node->left=NULL;
+		else
+			p_node->right=NULL;
+		free(c_node);
+	}
+
+	return LAB2_SUCCESS;
 }
 
 
@@ -241,6 +352,65 @@ int lab2_node_remove_fg(lab2_tree *tree, int key) {
  */
 int lab2_node_remove_cg(lab2_tree *tree, int key) {
     // You need to implement lab2_node_remove_cg function.
+lab2_node *p_node = NULL;
+	lab2_node *c_node = tree->root;
+
+	while(c_node){
+		if(key == c_node->key)
+			break;
+		else if(key < c_node->key){
+			p_node = c_node;
+			c_node = c_node->left;
+		}else{
+			p_node = c_node;
+			c_node = c_node->right;
+		}
+	}
+	// If tree doesn't have a key
+	if(!c_node)
+		return LAB2_ERROR;
+	
+	if(c_node->left && c_node->right){
+		lab2_node *r_p_node = c_node, *r_c_node = c_node->right;
+		while(r_c_node->left){
+			r_p_node = r_c_node;
+			r_c_node = r_c_node->left;
+		}
+		c_node->key = r_c_node->key;
+		if(r_p_node->right==r_c_node)
+			r_p_node->right=r_c_node->right;
+		else
+			r_p_node->left=r_c_node->right;
+		free(r_c_node);
+	}
+	else if(c_node -> left || c_node->right){
+		if(c_node->left){
+			if(c_node==tree->root)
+				tree->root=c_node->left;
+			else if(p_node->left==c_node)
+				p_node->left=c_node->left;
+			else
+				p_node->right=c_node->left;
+		}else{
+			if(c_node==tree->root)
+				tree->root=c_node->right;
+			else if(p_node->left==c_node)
+				p_node->left=c_node->right;
+			else
+				p_node->right=c_node->right;
+		}
+		free(c_node);
+	}else{
+		if(c_node==tree->root)
+			tree->root=NULL;
+		else if(p_node->left==c_node)
+			p_node->left=NULL;
+		else
+			p_node->right=NULL;
+		free(c_node);
+	}
+
+	return LAB2_SUCCESS;
 }
 
 
