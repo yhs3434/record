@@ -179,8 +179,10 @@ int lab2_node_insert_cg(lab2_tree *tree, lab2_node *new_node){
 		lab2_node *p_node = NULL, *c_node = tree->root;
 
 		while(c_node){
-			if(new_node -> key == c_node -> key)
+			if(new_node -> key == c_node -> key){
+				pthread_mutex_unlock(&mutex_global);
 				return LAB2_ERROR;
+			}
 			else if(new_node -> key < c_node -> key){
 				p_node = c_node;
 				c_node = c_node -> left;
@@ -354,6 +356,8 @@ int lab2_node_remove_fg(lab2_tree *tree, int key) {
  */
 int lab2_node_remove_cg(lab2_tree *tree, int key) {
 	// You need to implement lab2_node_remove_cg function.
+	pthread_mutex_lock(&mutex_global);
+	
 	lab2_node *p_node = NULL;
 	lab2_node *c_node = tree->root;
 
@@ -369,8 +373,10 @@ int lab2_node_remove_cg(lab2_tree *tree, int key) {
 		}
 	}
 	// If tree doesn't have a key
-	if(!c_node)
+	if(!c_node){
+		pthread_mutex_unlock(&mutex_global);
 		return LAB2_ERROR;
+	}
 
 	if(c_node->left && c_node->right){
 		lab2_node *r_p_node = c_node, *r_c_node = c_node->right;
@@ -412,6 +418,7 @@ int lab2_node_remove_cg(lab2_tree *tree, int key) {
 		free(c_node);
 	}
 
+	pthread_mutex_unlock(&mutex_global);
 	return LAB2_SUCCESS;
 }
 
