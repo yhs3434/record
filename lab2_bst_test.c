@@ -57,9 +57,7 @@ static void print_result(lab2_tree *tree,int num_threads,int node_count ,int is_
 
     printf("\n BST inorder iteration result : \n");
     result_count=lab2_node_print_inorder(tree);
-    printf("    total node count    : %d \n\n",node_count);
-
-
+    printf("    total node count    : %d \n\n",result_count);
 }
 
 void* thread_job_delete(void *arg){

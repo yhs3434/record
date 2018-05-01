@@ -64,6 +64,7 @@ typedef struct thread_arg{
  *  You need to implement these functions. 
  */
 int lab2_node_print_inorder(lab2_tree *tree);
+void lab2_node_print(lab2_node *node);
 lab2_tree *lab2_tree_create();
 lab2_node *lab2_node_create(int key);
 int lab2_node_insert(lab2_tree *tree, lab2_node *new_node);
