@@ -177,7 +177,7 @@ int lab2_node_remove(lab2_tree *tree, int key) {
 	
 	if(c_node->left && c_node->right){
 		lab2_node *r_p_node = c_node, *r_c_node = c_node->right;
-		while(!r_c_node->left){
+		while(r_c_node->left){
 			r_p_node = r_c_node;
 			r_c_node = r_c_node->left;
 		}
@@ -197,7 +197,7 @@ int lab2_node_remove(lab2_tree *tree, int key) {
 			else
 				p_node->right=c_node->left;
 		}else{
-			if(c_node->right)
+			if(c_node==tree->root)
 				tree->root=c_node->right;
 			else if(p_node->left==c_node)
 				p_node->left=c_node->right;
