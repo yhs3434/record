@@ -47,7 +47,6 @@ void lab2_node_print(lab2_node *node){
 	if(node){
 		lab2_node_print(node->left);
 		print_count++;
-		printf("%d ",node->key);
 		lab2_node_print(node->right);
 	}
 }
@@ -134,15 +133,27 @@ int lab2_node_insert(lab2_tree *tree, lab2_node *new_node){
  */
 int lab2_node_insert_fg(lab2_tree *tree, lab2_node *new_node){
 	// You need to implement lab2_node_insert_fg function.
+START:
 	if(!tree->root){
+		if(pthread_mutex_lock(&mutex_global))
+			goto START;
 		tree->root=new_node;
+		pthread_mutex_unlock(&mutex_global);
+		return LAB2_SUCCESS;
 	}
 	else{
-		lab2_node *p_node = NULL, *c_node = tree->root;
-
+		lab2_node *p_node, *c_node;
+LABEL:
+		p_node = NULL;
+		c_node = tree->root;
+		
 		while(c_node){
-			if(new_node -> key == c_node -> key)
+			pthread_mutex_lock(&c_node->mutex);
+
+			if(new_node -> key == c_node -> key){
+				pthread_mutex_unlock(&c_node->mutex);
 				return LAB2_ERROR;
+			}
 			else if(new_node -> key < c_node -> key){
 				p_node = c_node;
 				c_node = c_node -> left;
@@ -151,12 +162,15 @@ int lab2_node_insert_fg(lab2_tree *tree, lab2_node *new_node){
 				p_node = c_node;
 				c_node = c_node -> right;
 			}
+			pthread_mutex_unlock(&p_node->mutex);
 		}
-
+		if(pthread_mutex_lock(&p_node->mutex))
+			goto LABEL;
 		if(new_node->key < p_node->key)
 			p_node -> left = new_node;
 		else
 			p_node -> right = new_node;
+		pthread_mutex_unlock(&p_node->mutex);
 	}
 	return LAB2_SUCCESS;
 }
