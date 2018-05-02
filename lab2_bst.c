@@ -61,6 +61,7 @@ void lab2_node_print(lab2_node *node){
 lab2_tree *lab2_tree_create() {
 	// You need to implement lab2_tree_create function.
 	lab2_tree* newTree = (lab2_tree*)malloc(sizeof(lab2_tree));
+	assert(newTree != NULL);
 	newTree->root = NULL;
 
 	return newTree;
@@ -77,6 +78,7 @@ lab2_tree *lab2_tree_create() {
 lab2_node * lab2_node_create(int key) {
 	// You need to implement lab2_node_create function.
 	lab2_node* newNode = (lab2_node*)malloc(sizeof(lab2_node));
+	assert(newNode != NULL);
 	pthread_mutex_init(&newNode->mutex, NULL);
 	newNode -> left = NULL;
 	newNode -> right = NULL;
@@ -142,14 +144,12 @@ START:
 		return LAB2_SUCCESS;
 	}
 	else{
-		lab2_node *p_node, *c_node;
-LABEL:
-		p_node = NULL;
-		c_node = tree->root;
-		
-		while(c_node){
-			pthread_mutex_lock(&c_node->mutex);
+		lab2_node *p_node = NULL, *c_node = tree->root;
 
+		while(c_node){
+			if(p_node!=NULL)
+				pthread_mutex_unlock(&p_node->mutex);
+			pthread_mutex_lock(&c_node->mutex);
 			if(new_node -> key == c_node -> key){
 				pthread_mutex_unlock(&c_node->mutex);
 				return LAB2_ERROR;
@@ -162,10 +162,7 @@ LABEL:
 				p_node = c_node;
 				c_node = c_node -> right;
 			}
-			pthread_mutex_unlock(&p_node->mutex);
 		}
-		if(pthread_mutex_lock(&p_node->mutex))
-			goto LABEL;
 		if(new_node->key < p_node->key)
 			p_node -> left = new_node;
 		else
@@ -298,12 +295,21 @@ int lab2_node_remove(lab2_tree *tree, int key) {
  */
 int lab2_node_remove_fg(lab2_tree *tree, int key) {
 	// You need to implement lab2_node_remove_fg function.
-	lab2_node *p_node = NULL;
-	lab2_node *c_node = tree->root;
+	lab2_node *p_node, *c_node;
+START:
+	if(!tree->root){
+		return LAB2_ERROR;
+	}
+	p_node = NULL;
+	c_node = tree->root;
 
 	while(c_node){
-		if(key == c_node->key)
+		if(pthread_mutex_lock(&c_node->mutex))
+			goto START;
+		if(key == c_node->key){
+			pthread_mutex_unlock(&c_node->mutex);
 			break;
+		}
 		else if(key < c_node->key){
 			p_node = c_node;
 			c_node = c_node->left;
@@ -311,11 +317,14 @@ int lab2_node_remove_fg(lab2_tree *tree, int key) {
 			p_node = c_node;
 			c_node = c_node->right;
 		}
+		pthread_mutex_unlock(&p_node->mutex);
 	}
 	// If tree doesn't have a key
 	if(!c_node)
 		return LAB2_ERROR;
-
+	
+	if(pthread_mutex_lock(&c_node->mutex))
+		goto START;
 	if(c_node->left && c_node->right){
 		lab2_node *r_p_node = c_node, *r_c_node = c_node->right;
 		while(r_c_node->left){
@@ -328,6 +337,7 @@ int lab2_node_remove_fg(lab2_tree *tree, int key) {
 		else
 			r_p_node->left=r_c_node->right;
 		free(r_c_node);
+		pthread_mutex_unlock(&c_node->mutex);
 	}
 	else if(c_node -> left || c_node->right){
 		if(c_node->left){
@@ -345,6 +355,7 @@ int lab2_node_remove_fg(lab2_tree *tree, int key) {
 			else
 				p_node->right=c_node->right;
 		}
+		pthread_mutex_unlock(&c_node->mutex);
 		free(c_node);
 	}else{
 		if(c_node==tree->root)
@@ -353,6 +364,7 @@ int lab2_node_remove_fg(lab2_tree *tree, int key) {
 			p_node->left=NULL;
 		else
 			p_node->right=NULL;
+		pthread_mutex_unlock(&c_node->mutex);
 		free(c_node);
 	}
 
@@ -448,6 +460,7 @@ int lab2_node_remove_cg(lab2_tree *tree, int key) {
 void lab2_tree_delete(lab2_tree *tree) {
 	// You need to implement lab2_tree_delete function.
 	lab2_node_delete(tree->root);
+	free(tree);
 }
 
 /*
