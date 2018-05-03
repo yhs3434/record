@@ -21,6 +21,7 @@
 
 int print_count;
 pthread_mutex_t mutex_global = PTHREAD_MUTEX_INITIALIZER;
+pthread_cond_t cond_global = PTHREAD_COND_INITIALIZER;
 
 /*
  * TODO
@@ -135,40 +136,39 @@ int lab2_node_insert(lab2_tree *tree, lab2_node *new_node){
  */
 int lab2_node_insert_fg(lab2_tree *tree, lab2_node *new_node){
 	// You need to implement lab2_node_insert_fg function.
-START:
+	pthread_mutex_lock(&mutex_global);
 	if(!tree->root){
-		if(pthread_mutex_lock(&mutex_global))
-			goto START;
 		tree->root=new_node;
 		pthread_mutex_unlock(&mutex_global);
 		return LAB2_SUCCESS;
 	}
-	else{
-		lab2_node *p_node = NULL, *c_node = tree->root;
+	pthread_mutex_unlock(&mutex_global);
 
-		while(c_node){
-			if(p_node!=NULL)
-				pthread_mutex_unlock(&p_node->mutex);
-			pthread_mutex_lock(&c_node->mutex);
-			if(new_node -> key == c_node -> key){
-				pthread_mutex_unlock(&c_node->mutex);
-				return LAB2_ERROR;
-			}
-			else if(new_node -> key < c_node -> key){
-				p_node = c_node;
-				c_node = c_node -> left;
-			}
-			else{
-				p_node = c_node;
-				c_node = c_node -> right;
-			}
+	lab2_node *p_node = NULL, *c_node = tree->root;
+
+	while(c_node){
+		if(p_node!=NULL)
+			pthread_mutex_unlock(&p_node->mutex);
+		pthread_mutex_lock(&c_node->mutex);
+		if(new_node -> key == c_node -> key){
+			pthread_mutex_unlock(&c_node->mutex);
+			return LAB2_ERROR;
 		}
-		if(new_node->key < p_node->key)
-			p_node -> left = new_node;
-		else
-			p_node -> right = new_node;
-		pthread_mutex_unlock(&p_node->mutex);
+		else if(new_node -> key < c_node -> key){
+			p_node = c_node;
+			c_node = c_node -> left;
+		}
+		else{
+			p_node = c_node;
+			c_node = c_node -> right;
+		}
 	}
+	if(new_node->key < p_node->key)
+		p_node -> left = new_node;
+	else
+		p_node -> right = new_node;
+	pthread_mutex_unlock(&p_node->mutex);
+
 	return LAB2_SUCCESS;
 }
 
@@ -299,6 +299,7 @@ int lab2_node_remove_fg(lab2_tree *tree, int key) {
 START:
 	pthread_mutex_lock(&mutex_global);
 	if(!tree->root){
+		pthread_mutex_unlock(&mutex_global);
 		return LAB2_ERROR;
 	}
 	p_node = tree->root;
@@ -310,11 +311,13 @@ START:
 			pthread_mutex_unlock(&p_node->mutex);
 			return LAB2_ERROR;
 		}
-		if(key == c_node->key)
+		if(key == c_node->key){
 			break;
+		}
 		pthread_mutex_unlock(&p_node->mutex);
-		if(pthread_mutex_lock(&c_node->mutex))
-			goto START;
+		if(pthread_mutex_trylock(&c_node->mutex)){
+			c_node = p_node;
+		}
 
 		if(key < c_node->key){
 			p_node = c_node;
@@ -324,10 +327,16 @@ START:
 			c_node = c_node->right;
 		}
 	}
-	
+
 	if(c_node->left && c_node->right){
+		pthread_mutex_lock(&c_node->right->mutex);
 		lab2_node *r_p_node = c_node, *r_c_node = c_node->right;
+		pthread_mutex_unlock(&r_c_node->mutex);
 		while(r_c_node->left){
+			pthread_mutex_unlock(&r_p_node->mutex);
+			if(pthread_mutex_trylock(&r_c_node->mutex)){
+				r_c_node=r_p_node;
+			}
 			r_p_node = r_c_node;
 			r_c_node = r_c_node->left;
 		}
@@ -336,8 +345,9 @@ START:
 			r_p_node->right=r_c_node->right;
 		else
 			r_p_node->left=r_c_node->right;
-
-		pthread_mutex_unlock(&p_node->mutex);
+		
+		pthread_mutex_unlock(&r_p_node->mutex);
+		
 		free(r_c_node);
 	}
 	else if(c_node -> left || c_node->right){
@@ -356,7 +366,7 @@ START:
 			else
 				p_node->right=c_node->right;
 		}
-		pthread_mutex_unlock(&p_node->mutex);
+		
 		free(c_node);
 	}else{
 		if(c_node==tree->root)
@@ -365,9 +375,10 @@ START:
 			p_node->left=NULL;
 		else
 			p_node->right=NULL;
-		pthread_mutex_unlock(&p_node->mutex);
+		
 		free(c_node);
 	}
+	pthread_mutex_unlock(&p_node->mutex);
 	return LAB2_SUCCESS;
 }
 
@@ -383,7 +394,7 @@ START:
 int lab2_node_remove_cg(lab2_tree *tree, int key) {
 	// You need to implement lab2_node_remove_cg function.
 	pthread_mutex_lock(&mutex_global);
-	
+
 	lab2_node *p_node = NULL;
 	lab2_node *c_node = tree->root;
 
