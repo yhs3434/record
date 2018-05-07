@@ -297,7 +297,8 @@ int lab2_node_remove_fg(lab2_tree *tree, int key) {
 	// You need to implement lab2_node_remove_fg function.
 	lab2_node *p_node, *c_node;
 START:
-	pthread_mutex_lock(&mutex_global);
+	if(pthread_mutex_trylock(&mutex_global))
+		goto START;
 	if(!tree->root){
 		pthread_mutex_unlock(&mutex_global);
 		return LAB2_ERROR;
@@ -316,7 +317,7 @@ START:
 		}
 		pthread_mutex_unlock(&p_node->mutex);
 		if(pthread_mutex_trylock(&c_node->mutex)){
-			c_node = p_node;
+			goto START;
 		}
 
 		if(key < c_node->key){
@@ -334,9 +335,7 @@ START:
 		pthread_mutex_unlock(&r_c_node->mutex);
 		while(r_c_node->left){
 			pthread_mutex_unlock(&r_p_node->mutex);
-			if(pthread_mutex_trylock(&r_c_node->mutex)){
-				r_c_node=r_p_node;
-			}
+			pthread_mutex_lock(&r_c_node->mutex);
 			r_p_node = r_c_node;
 			r_c_node = r_c_node->left;
 		}

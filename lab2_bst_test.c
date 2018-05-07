@@ -29,6 +29,8 @@
 #define LAB2_OPTYPE_INSERT          0
 #define LAB2_OPTYPE_DELETE          1
 
+#define LAB2_MAX					9999
+
 void lab2_sync_usage(char *cmd)
 {
     printf("\n Usage for %s : \n",cmd);
@@ -276,6 +278,61 @@ void bst_test(int num_threads,int node_count){
     free(data);
 }
 
+int choose_best_thread(int node_count)
+{	
+    lab2_tree *tree;
+    lab2_node *node;    
+    struct timeval tv_insert_start, tv_insert_end, tv_delete_start, tv_delete_end, tv_start, tv_end;
+    int errors,i=0,j=0,count=0;
+    int root_data = 40; 
+    int term, is_sync;
+    double exe_time=0.0;
+    thread_arg *threads;
+    int *data = (int*)malloc(sizeof(int)*node_count);
+	double best_time = LAB2_MAX;
+	int best_thread = 0;
+
+	is_sync = LAB2_TYPE_FINEGRAINED;
+	tree = lab2_tree_create();
+
+    srand(time(NULL));
+    for (i=0; i < node_count; i++) { 
+        data[i] = rand();
+    }
+
+	for(i=1;i<=100;i++){
+		if(!(threads = (thread_arg*)malloc(sizeof(thread_arg) * i)))
+			abort();
+		term = node_count / i;
+		gettimeofday(&tv_delete_start, NULL);
+		for(j=0;j<i;j++){
+			thread_arg *th_arg = &threads[j];
+			th_arg->tree = tree;
+			th_arg->is_sync = is_sync;
+			th_arg->data_set = data;
+			th_arg->start = j*term;
+			th_arg->end = (j+1)*term;
+
+			pthread_create(&threads[j].thread,NULL,thread_job_delete,(void*)th_arg);
+		}
+		
+		for(j=0; j<i; j++)
+			pthread_join(threads[j].thread,NULL);
+
+		gettimeofday(&tv_delete_end, NULL);
+		exe_time = get_timeval(&tv_delete_start, &tv_delete_end);
+		if(exe_time < best_time){
+			best_time = exe_time;
+			best_thread = i;
+		}
+		lab2_tree_delete(tree);
+		free(threads);
+	}
+	free(data);
+	return best_thread;
+}
+
+
 int main(int argc, char *argv[]) 
 {
     char op;
@@ -283,6 +340,13 @@ int main(int argc, char *argv[])
     int fd;
 
     optind = 0;
+
+	/*
+	if(strcmp(argv[1],"test")==0){
+		printf("The best num of threads = %d\n",choose_best_thread(100000));
+		return LAB2_SUCCESS;
+	}
+	*/
 
     while ((op = getopt(argc, argv, "t:c:")) != -1) {
         switch (op) {
