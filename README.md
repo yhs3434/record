@@ -2,7 +2,7 @@
 <hr/>
 <h2>나는</h2>
 <p>나는 지금 네이버, 카카오, 라인 모두 기술면접에서 탈락한 쓰레기 개발자다. 하지만 6개월 뒤에는 다를 것이다.</p>
-<h2>책</h2>
+<h2>읽을 책</h2>
 <ol>
     <li>
         <a href="https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=53051178" target="_blank">
@@ -149,11 +149,6 @@
             Introduction to Algorithms
         </a>
     </li>
-    <li>
-        <a href="https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=897535" target="_blank">
-            <del>뇌를 자극하는 윈도우즈 시스템 프로그래밍</del>
-        </a>
-    </li>
     <li style="display:none;">
         <a href="" target="_blank">
             책
@@ -161,7 +156,29 @@
     </li>
 </ol>
 <blockquote cite="https://www.sangkon.com/good_books_for_dev_2018/">내 마음대로 선정한 개발자/프로그래머 추천도서(필독서) 50선(20190409)</blockquote>
-<h2>언어</h2>
+<h2>읽은 책</h2>
+<h3>컴퓨터 관련</h3>
+<ol>
+    <li>
+        <a href="https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=897535" target="_blank">
+            뇌를 자극하는 윈도우즈 시스템 프로그래밍
+        </a>
+    </li>
+    <li>
+        <a href="https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=8138892">
+            철저해설 HTML5 - 마크업 가이드북
+        </a>
+    </li>
+</ol>
+<h3>이외</h3>
+<ol>
+    <li>
+        <a href="https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=105352227">
+            멈추면, 비로소 보이는 것들 - 혜민 스님과 함께하는 내 마음 다시보기
+        </a>
+    </li>
+</ol>
+<h2>사용 언어</h2>
 <ul>
     <li>C</li>
     <li><sub>C++</sub></li>
