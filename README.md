@@ -159,3 +159,13 @@
     </li>
 </ol>
 <blockquote cite="https://www.sangkon.com/good_books_for_dev_2018/">내 마음대로 선정한 개발자/프로그래머 추천도서(필독서) 50선(20190409)</blockquote>
+<h2>언어</h2>
+<hr/>
+<ul>
+    <li>C</li>
+    <li><small>C++</small></li>
+    <li>JAVA</li>
+    <li><strong>Python3</strong></li>
+    <li><strong>Javascript</strong></li>
+    <li><small>R</small></li>
+</ul>
