@@ -163,9 +163,9 @@
 <hr/>
 <ul>
     <li>C</li>
-    <li><small>C++</small></li>
+    <li><sub>C++</sub></li>
     <li>JAVA</li>
-    <li><strong>Python3</strong></li>
-    <li><strong>Javascript</strong></li>
-    <li><small>R</small></li>
+    <li><mark><strong>Python3</strong></mark></li>
+    <li><mark><strong>Javascript</strong></mark></li>
+    <li><sub>R</sub></li>
 </ul>
