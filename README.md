@@ -1,7 +1,7 @@
 <h1>나는 개발자다.</h1>
 <hr/>
 <h2>나는</h2>
-<p>나는 지금 네이버, 카카오, 라인 모두 기술면접에서 탈락한 쓰레기 개발자다. 하지만 6개월 뒤에는 다를 것이다.</p>
+<p>지금 쓰레기 개발자다.</p>
 <h2>읽을 책</h2>
 <ol>
     <li>
@@ -149,11 +149,6 @@
             Introduction to Algorithms
         </a>
     </li>
-    <li style="display:none;">
-        <a href="" target="_blank">
-            책
-        </a>
-    </li>
 </ol>
 <blockquote cite="https://www.sangkon.com/good_books_for_dev_2018/">내 마음대로 선정한 개발자/프로그래머 추천도서(필독서) 50선(20190409)</blockquote>
 <h2>읽은 책</h2>
@@ -165,7 +160,7 @@
         </a>
     </li>
     <li>
-        <a href="https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=8138892">
+        <a href="https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=8138892" target="_blank">
             철저해설 HTML5 - 마크업 가이드북
         </a>
     </li>
@@ -173,7 +168,7 @@
 <h3>이외</h3>
 <ol>
     <li>
-        <a href="https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=105352227">
+        <a href="https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=105352227" target="_blank">
             멈추면, 비로소 보이는 것들 - 혜민 스님과 함께하는 내 마음 다시보기
         </a>
     </li>
