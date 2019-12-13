@@ -151,6 +151,12 @@
     </li>
 </ol>
 <blockquote cite="https://www.sangkon.com/good_books_for_dev_2018/">내 마음대로 선정한 개발자/프로그래머 추천도서(필독서) 50선(20190409)</blockquote>
+<h2>읽고 있는 책</h2>
+<ul>
+    <li>헤드 퍼스트 디자인 패턴</li>
+    <li>Introduction to algorithms</li>
+    <li>러닝 자바스크립트</li>
+</ul>
 <h2>읽은 책</h2>
 <h3>컴퓨터 관련</h3>
 <ol>
