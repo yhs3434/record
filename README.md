@@ -1,8 +1,12 @@
-<h1>나는 개발자다.</h1>
-<hr/>
-<h2>나는</h2>
-<p>지금 쓰레기 개발자다.</p>
-<h2>읽을 책</h2>
+
+
+
+# 나는 개발자다.
+
+## 나는
+공부한다.
+
+## 읽을 책
 <ol>
     <li>
         <a href="https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=53051178" target="_blank">
@@ -150,41 +154,30 @@
         </a>
     </li>
 </ol>
-<blockquote cite="https://www.sangkon.com/good_books_for_dev_2018/">내 마음대로 선정한 개발자/프로그래머 추천도서(필독서) 50선(20190409)</blockquote>
-<h2>읽고 있는 책</h2>
-<ul>
-    <li>헤드 퍼스트 디자인 패턴</li>
-    <li>Introduction to algorithms</li>
-    <li>러닝 자바스크립트</li>
-</ul>
-<h2>읽은 책</h2>
-<h3>컴퓨터 관련</h3>
-<ol>
-    <li>
-        <a href="https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=897535" target="_blank">
-            뇌를 자극하는 윈도우즈 시스템 프로그래밍
-        </a>
-    </li>
-    <li>
-        <a href="https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=8138892" target="_blank">
-            철저해설 HTML5 - 마크업 가이드북
-        </a>
-    </li>
-</ol>
-<h3>이외</h3>
-<ol>
-    <li>
-        <a href="https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=105352227" target="_blank">
-            멈추면, 비로소 보이는 것들 - 혜민 스님과 함께하는 내 마음 다시보기
-        </a>
-    </li>
-</ol>
-<h2>사용 언어</h2>
-<ul>
-    <li>C</li>
-    <li><sub>C++</sub></li>
-    <li>JAVA</li>
-    <li><mark><strong>Python3</strong></mark></li>
-    <li><mark><strong>Javascript</strong></mark></li>
-    <li><sub>R</sub></li>
-</ul>
+
+> 내 마음대로 선정한 개발자/프로그래머 추천도서(필독서) 50선(20190409)
+> https://www.sangkon.com/good_books_for_dev_2018/
+
+## 읽고 있는 책
+
+- 헤드 퍼스트 디자인 패턴
+- Introduction to algorithms
+- SQL 더 쉽게, 더 깊게
+
+## 읽은 책
+
+- ### 컴퓨터 관련
+
+	1. [뇌를 자극하는 윈도우즈 시스템 프로그래밍](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=897535)
+	2. [철저해설 HTML5 - 마크업 가이드북](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=8138892)
+	3. [그림으로 배우는 HTTP & Network](http://www.yes24.com/Product/goods/15894097)
+
+- 이외
+	1. [멈추면, 비로소 보이는 것들 - 혜민 스님과 함께하는 내 마음 다시보기](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=105352227)
+
+## 사용 언어
+- C
+- JAVA
+- Python3 [코테]
+- Javascript [개발]
+- *C++* [코테, 미숙]
