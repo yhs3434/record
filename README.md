@@ -171,6 +171,7 @@
 	1. [뇌를 자극하는 윈도우즈 시스템 프로그래밍](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=897535)
 	2. [철저해설 HTML5 - 마크업 가이드북](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=8138892)
 	3. [그림으로 배우는 HTTP & Network](http://www.yes24.com/Product/goods/15894097)
+	4. [SQL 더 쉽게, 더 깊게](https://book.naver.com/bookdb/book_detail.nhn?bid=8109048)
 
 - 이외
 	1. [멈추면, 비로소 보이는 것들 - 혜민 스님과 함께하는 내 마음 다시보기](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=105352227)
