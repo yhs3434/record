@@ -160,9 +160,7 @@
 
 ## 읽고 있는 책
 
-- 헤드 퍼스트 디자인 패턴
 - Introduction to algorithms
-- SQL 더 쉽게, 더 깊게
 
 ## 읽은 책
 
@@ -172,6 +170,9 @@
 	2. [철저해설 HTML5 - 마크업 가이드북](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=8138892)
 	3. [그림으로 배우는 HTTP & Network](http://www.yes24.com/Product/goods/15894097)
 	4. [SQL 더 쉽게, 더 깊게](https://book.naver.com/bookdb/book_detail.nhn?bid=8109048)
+	5. 헤드 퍼스트 디자인 패턴 (50%)
+	6. SQL 더 쉽게, 더 깊게
+	7. 코어 자바스크립트
 
 - 이외
 	1. [멈추면, 비로소 보이는 것들 - 혜민 스님과 함께하는 내 마음 다시보기](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=105352227)
