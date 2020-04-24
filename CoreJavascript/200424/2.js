@@ -1,3 +1,5 @@
+//ES6식 상속.
+
 var Rectangle = class {
   constructor (width, height) {
     this.width = width;

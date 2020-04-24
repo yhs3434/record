@@ -1,3 +1,5 @@
+// ES5 와 ES6 의 클래스 상속 비교.
+
 var ES5 = function (name) {
   this.name = name;
 };
