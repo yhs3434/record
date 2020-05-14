@@ -1,0 +1,16 @@
+<!doctype html>
+<html>
+  <body>
+    <input type='button' value='fetch' onclick="
+      fetch('css').then(function (res) {
+        res.text().then(function (text) {
+          alert(text);
+        })
+      })
+    ">
+  </body>
+</html>
+
+<!--
+  https://opentutorials.org/course/3281/20566
+  -->
