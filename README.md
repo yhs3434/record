@@ -1,5 +1,7 @@
 # 기록
 
+- 후뇌 이상으로 약 2~3주간 입원 후 퇴원했습니다. 몸 회복 시키면서 책좀 읽고 기록을 남기겠습니다. 지능에 관련된 대뇌에는 이상이 전혀 없고 신체 유지 관련한 후뇌에만 물혹이 존재했었으니 걱정은 ㄴㄴ요.. 2주정도 안쪽으로 회복 완료 할 것 같습니다. ^__^ 
+
 ## 읽을 책
 
 - [~~CODE 코드~~](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=53051178)
@@ -15,6 +17,7 @@
 - [컴파일러 구조와 원리 - 컴파일러로 배우는 언어 처리 시스템](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=7739014)
 - [클린 코더 - 단순 기술자에서 진정한 소프트웨어 장인이 되기까지](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=86619346)
 - [코딩 더 매트릭스](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=59668511)
+- [객체지향 자바스크립트 3/e - 객체지향 프로그래밍의 기초부터 함수.객체.프로토타입까지](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=118916664)
 - [함수형 자바스크립트 프로그래밍](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=123715872)
 - [SQL 레벨업 - DB 성능 최적화를 위한 SQL 실전 가이드](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=75566292)
 - [리팩토링 Refactoring - 코드 품질을 개선하는 객체지향 사고법](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=20793053)
@@ -34,9 +37,11 @@
 
 ## 읽고 있는 책
 
-- Introduction to algorithms
+- Introduction to algorithms (코로나로 중단)
 - CODE
+- 객체지향 자바스크립트 3/e
 - 개미
+- 쓸모있는 경제학
 
 ## 읽은 책
 
