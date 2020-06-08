@@ -17,7 +17,7 @@
 - [컴파일러 구조와 원리 - 컴파일러로 배우는 언어 처리 시스템](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=7739014)
 - [클린 코더 - 단순 기술자에서 진정한 소프트웨어 장인이 되기까지](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=86619346)
 - [코딩 더 매트릭스](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=59668511)
-- [객체지향 자바스크립트 3/e - 객체지향 프로그래밍의 기초부터 함수.객체.프로토타입까지](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=118916664)
+- [~~객체지향 자바스크립트 3/e - 객체지향 프로그래밍의 기초부터 함수.객체.프로토타입까지~~](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=118916664)
 - [함수형 자바스크립트 프로그래밍](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=123715872)
 - [SQL 레벨업 - DB 성능 최적화를 위한 SQL 실전 가이드](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=75566292)
 - [리팩토링 Refactoring - 코드 품질을 개선하는 객체지향 사고법](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=20793053)
