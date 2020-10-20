@@ -104,11 +104,11 @@ nativeTheme.on('updated', function theThemeHasChaged () {
 
 만약 내가 외부의 컨텐츠(서드파티)를 일렉트론의 BrowserWindow에 삽입하기를 원한다면 3가지 방법이 있다. Iframe, WebView, BrowserView 이렇게 3가지 방법. 각 방법은 장단점이 있고 특징이 있기때문에 설명함.
 
-   + Iframe
+    + Iframe
 
    일렉트론의 iframe은 일반적인 다른 브라우저의 iframe과 유사하다. 따라서 보안적으로 좋은 태그가 아니기때문에 만약 사용한다면 sandbox 영역을 만들어서 사용하는 것이 낫다.
 
-   + WebViews
+    + WebViews
 
    현재는 크로미움의 웹뷰를 사용하고 있다. 따라서 현재의 WebView API가 Electron의 미래 버전에서도 계속 사용 가능할 것이라고 보장되지 않는다. 만약 그래도 사용하기를 원한다면 BrowserWindow의 webPreferences에서 webviewTag를 true로 설정하라.
 
@@ -116,7 +116,7 @@ nativeTheme.on('updated', function theThemeHasChaged () {
 
    iframe태그에 비해서 웹뷰 태그가 다소 느린 경향은 있지만, 다양한 이벤트 처리에 있어서 더 큰 통제력을 지원할 것이다.
 
-   + BrowserViews
+    + BrowserViews
 
    브라우저뷰는 DOM의 한 부분이 아니다.대신에 브라우저뷰는 메인 프로세스 위에서 동작한다. 이 말은 브라우저 뷰가 완벽하게 DOM또는 CSS와 분리되어 있음을 의미하며 또한 BrowserWindow 컨텐츠와 완전히 분리되어 있음을 의미한다.
 
