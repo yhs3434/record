@@ -241,6 +241,7 @@ app.whenReady().then(() => {
   Mousetrap.bind('up up down down left right left right b a enter', () => {
       console.log('konami code');
   });
+```
 
 - 오프라인/온라인 감지
 
