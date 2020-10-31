@@ -16,3 +16,5 @@
 앞으로 개인적인 개발에는 React를 이용할 것인데, 조직원으로서 Vue에 대한 공부를 또한 해야할 필요성을 느꼈다.
 
 오늘의 느낀점 끝.
+
+next : https://kr.vuejs.org/v2/guide/instance.html ~
