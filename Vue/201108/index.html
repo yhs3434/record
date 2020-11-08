@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Vue study</title>
+        <meta charset="UTF-8">
+        <link rel="stylesheet" href="index.css">
+        <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    </head>
+    <body>
+        Vue study!
+        <hr>
+        <div id="app1">
+            <a v-on:click="doSomething">클릭 해보3</a>
+            <span>{{ msg }}</span>
+            <a v-bind:href="url">href Test</a>
+        </div>
+        <div id='example'>
+            <p>원본 메시지 : "{{message}}"</p>
+            <p>역순으로 표시한 메시지: "{{reversedMessage}}"</p>
+        </div>
+        <div id='app3'>
+            {{ fullName }}
+        </div>
+        <div id="watch-example">
+            <p>
+                yes/no 질문을 물어보세요 : 
+                <input v-model="question">
+            </p>
+            <p>{{ answer }}</p>
+        </div>
+        <script src="https://unpkg.com/axios@0.12.0/dist/axios.min.js"></script>
+        <script src="https://unpkg.com/lodash@4.13.1/lodash.min.js"></script>
+        <script src="index.js"></script>
+    </body>
+</html>
