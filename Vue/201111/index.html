@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Vue study</title>
+        <meta charset="UTF-8">
+        <link rel="stylesheet" href="index.css">
+        <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    </head>
+    <body>
+        Vue study!
+        <hr>
+        <div id="app1">
+            <navigation-link url="/profile">
+                Your Profile
+            </navigation-link>
+        </div>
+        <div id="app2">
+            <base-layout>
+                <template v-slot:header>
+                    <h1>Here might be a page title</h1>
+                </template>
+                <p>A paragraph for the main content.</p>
+                <p>And another one.</p>
+                <template v-slot:footer>
+                    <p>Here's some contact info</p>
+                </template>
+            </base-layout>
+        </div>
+        <div id="app3">
+            <current-user>
+                {{ user.firstName }}
+            </current-user>
+        </div>
+        <div id="app4">
+            <current-user v-slot:default="slotProps">
+                {{ slotProps.user.firstName }}
+            </current-user>
+        </div>
+        <div id="app5">
+            {{ data }}
+        </div>
+        <div id="app6">
+            <button v-on:click="show=!show">
+                Toggle
+            </button>
+            <transition name="fade">
+                <p v-if="show">hello</p>
+            </transition>
+        </div>
+        <div id="app7">
+            <transition name="component-fade" mode="out-in">
+                <component v-bind:is="view"></component>
+            </transition>
+        </div>
+        <div id="app8">
+                
+        </div>
+        <script src="index.js"></script>
+    </body>
+</html>

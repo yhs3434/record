@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Vue study</title>
+        <meta charset="UTF-8">
+        <link rel="stylesheet" href="index.css">
+        <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    </head>
+    <body>
+        Vue study!
+        <hr>
+        <div id="app">
+          <p>{{foo}}</p>
+          <!-- obj.foo는 더이상 변하지 않습니다! -->
+          <button v-on:click="foo = 'baz'">Change it</button>
+        </div>
+        <script src="index.js"></script>
+    </body>
+</html>

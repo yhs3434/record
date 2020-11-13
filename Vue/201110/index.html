@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Vue study</title>
+        <meta charset="UTF-8">
+        <link rel="stylesheet" href="index.css">
+        <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    </head>
+    <body>
+        Vue study!
+        <hr>
+        <div id="app1">
+            <input type="radio" v-model="picked" value="a">
+
+            <input type="checkbox" v-model="toggle" value="test">
+
+            <select v-model="selected">
+                <option value="abc">ABC</option>
+            </select>
+            {{picked}}<br>
+            {{toggle}}<br>
+            {{selected}}
+        </div>
+        <div id="app2">
+            <input
+                type="checkbox"
+                v-model="toggle"
+                true-value="yes"
+                false-value="no"
+            >
+        </div>
+        <div id="app3">
+            <select v-model="selected">
+                <option v-bind:value="{number: 123}">123</option>
+            </select>
+        </div>
+        <div id="app4">
+            <my-component></my-component>
+        </div>
+        <div id="app5">
+            <simple-counter></simple-counter>
+            <simple-counter></simple-counter>
+            <simple-counter></simple-counter>
+        </div>
+        <div id="app6">
+            <simple-counter></simple-counter>
+            <simple-counter></simple-counter>
+            <simple-counter></simple-counter>
+        </div>
+        <div id="app7">
+            <child message="안녕하세요!"></child>
+        </div>
+        <div id="app8">
+            <input v-model="parentMsg">
+            <br>
+            <child v-bind:my-message="parentMsg"></child>
+        </div>
+        <div id="app9">
+            <p>{{total}}</p>
+            <button-counter v-on:increment="incrementTotal"></button-counter>
+            <button-counter v-on:increment="incrementTotal"></button-counter>
+        </div>
+        <div id="app10">
+            <currency-input v-model="price"></currency-input>
+        </div>
+        <div id="app11">
+            <h1>나는 부모 컴포넌트의 제목입니다</h1>
+            <my-component>
+                <p>이것은 원본 컨텐츠 입니다.</p>
+                <p>이것은 원본 중 추가 컨텐츠 입니다.</p>
+            </my-component>
+        </div>
+        <div id="app12">
+            <app-layout>
+                <h1 slot="header">여기에 페이지 제목이 위치합니다.</h1>
+
+                <p>메인 컨텐츠의 단락입니다.</p>
+                <p>하나 더 있습니다.</p>
+
+                <p slot="footer">여기에 연락처 정보입니다.</p>
+            </app-layout>
+        </div>
+        <div id="app13">
+            <div class="parent">
+                <child>
+                    <template slot-scope="props">
+                        <span>hello from parent</span>
+                        <span>{{ props.text }}</span>
+                    </template>
+                </child>
+            </div>
+        </div>
+        <div id="app14">
+            <component v-bind:is="currentView">
+
+            </component>
+        </div>
+        <div id="app15">
+            <span ref="profile">test</span>
+        </div>
+        <div id="app16">
+            <base-input
+                ref="app16-child"
+                v-model="username"
+                require
+                placeholder="Enter your username"
+            ></base-input>
+        </div>
+        <div id="app17">
+            <base-input v-on:focus.native="onFocus"></base-input>
+        </div>
+
+        <script src="index.js"></script>
+    </body>
+</html>
