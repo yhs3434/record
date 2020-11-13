@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Vue study</title>
+        <meta charset="UTF-8">
+        <link rel="stylesheet" href="index.css">
+        <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    </head>
+    <body>
+        Vue study!
+        <hr>
+        <div class="static" v-bind:class="{active: isActive, 'text-danger': hasError}">
+            {{ message }}
+        </div>
+        <div id="app1">
+            <div v-bind:class="classObject">
+                classObject
+            </div>
+            <div v-bind:class="[activeClass, errorClass]">
+                arrayClass
+            </div>
+        </div>
+        <div>
+            <my-component class="baz boo"></my-component>
+            foobarbazboo
+        </div>
+        <div id="app2">
+            <div v-bind:style="{color: activeColor, fontSize: fontSize + 'px' }">
+                font tEst
+            </div>
+        </div>
+        <div id="app3">
+            <h1 v-if="awesome">Vue is awesome!</h1>
+            <h1 v-else>Oh no</h1>
+        </div>
+        <div id="app4">
+            <template v-if="loginType === 'username'">
+                <label>사용자 이름</label>
+                <input placeholder="사용자 이름을 입력하세요">
+            </template>
+            <template v-else>
+                <label>이메일</label>
+                <input plcaeholder="이메일 주소를 입력하세요">
+            </template>
+        </div>
+        <ul id="example-1">
+            <li v-for="item in items">
+                {{ item.message }}
+            </li>
+        </ul>
+        <ul id="example-2">
+            <li v-for="(item, index) in items">
+                {{parentMessage}} - {{index}} - {{item.message}}
+            </li>
+        </ul>
+        <ul id="v-for-object" class="demo">
+            <li v-for="value in object">
+                {{value}}
+            </li>
+        </ul>
+        <ul id="up">
+            <li v-for="item in userProfile">
+                {{item}}, {{item.age}}
+            </li>
+        </ul>
+
+        <ul id="vfor2">
+            <li v-for="n in evenNumbers">{{ n }}</li>
+        </ul>
+
+        <ul id="vfor3">
+            <template v-for="item in items">
+                <li>{{item.msg}}</li>
+                <li class="divider" role="presentation"></li>
+            </template>
+        </ul>
+        <div id="todo-list-example">
+            <form v-on:submit.prevent="addNewTodo">
+                <label for="new-todo">Add a todo</label>
+                <input
+                    v-model="newTodoText"
+                    id="new-todo"
+                    placeholder="E.g. Feed the cat"
+                >
+                <button>Add</button>
+            </form>
+            <ul>
+                <li
+                    is="todo-item"
+                    v-for="(todo, index) in todos"
+                    v-bind:key="todo.id"
+                    v-bind:title="todo.title"
+                    v-on:remove="todos.splice(index, 1)"
+                ></li>
+            </ul>
+        </div>
+        <div id="on-example-1">
+            <button v-on:click="counter += 1">Add 1</button>
+            <p>위 버튼을 클릭한 횟수는 {{counter}}번 입니다.</p>
+        </div>
+
+        <div id="example-3">
+            <button v-on:click="warn('Form cannot be sumitted yet.', $event)">
+                Submit
+            </button>
+        </div>
+
+        <div id="example-4">
+            <input v-on:keyup.enter="onPageDown">
+        </div>
+
+        <div id="ex-5">
+            <span>여러 줄을 가지는 메시지 : </span>
+            <p style="white-space: pre-line">{{message}}</p>
+            <br>
+            <textarea v-model="message" placeholder="여러 줄을 입력해보세요"></textarea>
+        </div>
+        <div id="ex-6">
+            <input type="checkbox" id="checkbox" v-model="checked">
+            <label for="checkbox">{{checked}}</label>
+        </div>
+        <div id="ex-7">
+            <input type="checkbox" id="jack" value="JackJack" v-model="checkedNames">
+            <label for="jack">Jack</label>
+            <input type="checkbox" id="john" value="JohnJohn" v-model="checkedNames">
+            <label for="john">John</label>
+            <br>
+            <span>체크한 이름 : {{checkedNames}}</span>
+        </div>
+        <div id="ex-8">
+            <select v-model="selected">
+                <option v-for="option in options" v-bind:value="option.value">
+                    {{option.text}}
+                </option>
+            </select>
+            <span>Selected : {{selected}}</span>
+        </div>
+
+        <script src="index.js"></script>
+    </body>
+</html>
