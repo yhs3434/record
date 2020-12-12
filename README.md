@@ -1,6 +1,6 @@
 # 기록
 
-- 후뇌 이상으로 약 2~3주간 입원 후 퇴원했습니다. 몸 회복 시키면서 책좀 읽고 기록을 남기겠습니다. 지능에 관련된 대뇌에는 이상이 전혀 없고 신체 유지 관련한 후뇌에만 물혹이 존재했었으니 걱정은 ㄴㄴ요.. 2주정도 안쪽으로 회복 완료 할 것 같습니다. ^__^ 
+-  ^__^ 
 
 ## 읽을 책
 
@@ -34,33 +34,3 @@
 
 > 내 마음대로 선정한 개발자/프로그래머 추천도서(필독서) 50선(20190409)
 > > https://www.sangkon.com/good_books_for_dev_2018/
-
-## 읽고 있는 책
-
-- Introduction to algorithms (코로나로 중단)
-- CODE
-- 객체지향 자바스크립트 3/e
-- 개미
-- 쓸모있는 경제학
-
-## 읽은 책
-
-- ### 컴퓨터 관련
-
-	1. [뇌를 자극하는 윈도우즈 시스템 프로그래밍](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=897535)
-	2. [철저해설 HTML5 - 마크업 가이드북](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=8138892)
-	3. [그림으로 배우는 HTTP & Network](http://www.yes24.com/Product/goods/15894097)
-	4. [SQL 더 쉽게, 더 깊게](https://book.naver.com/bookdb/book_detail.nhn?bid=8109048)
-	5. 헤드 퍼스트 디자인 패턴 (50%)
-	6. SQL 더 쉽게, 더 깊게
-	7. 코어 자바스크립트
-
-- 이외
-	1. [멈추면, 비로소 보이는 것들 - 혜민 스님과 함께하는 내 마음 다시보기](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=105352227)
-
-## 사용 언어
-- C
-- JAVA
-- Python3 [코테]
-- Javascript [개발]
-- *C++* [코테, 미숙]
