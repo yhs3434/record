@@ -136,3 +136,71 @@
         );
     }
     ```
+
+- 성능 최적화
+
+    프로덕션 빌드를 활용하라.
+
+    크롬 브라우저의 performance 탭을 사용하여 컴포넌트가 어떻게 마운트, 업데이트, 마운트 해제되는지 시각적으로 볼 수 있다.
+
+    만약 크롬에서 이 작업을 하려면
+    1. React 개발 도구를 포함한 모든 Chrome 확장 프로그램을 비활성화한다.
+    2. 개발 모드에서 애플리케이션을 실행 중인지 확인한다.
+    3. Chrome 개발 도구의 Performance탭을 열고 Record 버튼을 클릭한다.
+    4. 프로파일링 할 작업을 진행한다. 20초 이상 기록하지 말 것.
+    5. 기록을 멈추라.
+    6. React 이벤트는 User Timing 라벨로 그룹화 된다.
+
+    virtual dom을 수정할 때 성능이 눈에 띄게 떨어지는 경우가 있을 수 있다. 만약 굳이 어떤 변화에서는 리렌더링이 필요가 없다면 shouldComponentUpdate() 내에서 false를 반환시키면 된다.
+
+    PureComponent를 상속하면 props와 state를 단순 비교 하므로, shouldComponentUpdate에서 성능적으로 이득을 본 것처럼 만들 수 있다.
+
+    하지만 아래의 경우 정상적인 렌더링이 되지 않는다.
+
+    ```javascript
+    class ListOfWords extends React.PureComponent {
+    render() {
+        return <div>{this.props.words.join(',')}</div>;
+    }
+    }
+
+    class WordAdder extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+        words: ['marklar']
+        };
+        this.handleClick = this.handleClick.bind(this);
+    }
+
+    handleClick() {
+        // This section is bad style and causes a bug
+        const words = this.state.words;
+        words.push('marklar');
+        this.setState({words: words});
+    }
+
+    render() {
+        return (
+        <div>
+            <button onClick={this.handleClick} />
+            <ListOfWords words={this.state.words} />
+        </div>
+        );
+    }
+    }
+    ```
+
+    state의 불변성을 지키며 손쉽게 업데이트 될 수 있도록 javascript의 spread syntax를 사용한다.
+
+    객체 또한 변경 없이 손쉽게 업데이트될 수 있도록 object spread properties를 추가하자는 제안이 있다.
+
+- Portal
+
+    ```javascript
+    ReactDOM.createPortal(child, container);
+    ```
+    
+    child를 가장 가까운 부모 Node에 렌더링 시키는 것이 아니라, container의 자식으로서 렌더링 시키는 함수이다.
+
+    html DOM 상에서는 하위 컴포넌트가 아니더라도 React DOM 상에서 하위 컴포넌트라면 해당 컴포넌트의 이벤트 버블링은 포착이 된다.
