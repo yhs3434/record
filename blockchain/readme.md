@@ -1,0 +1,1 @@
+bitcoin.org : https://bitcoin.org/ko/
