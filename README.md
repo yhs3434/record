@@ -2,6 +2,7 @@
 
 - 난 깨달았다. 나의 코딩 실력은 아직 죽지 않았다는 것을.
 
+
 ## 읽을 책
 
 - [~~CODE 코드~~](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=53051178)
