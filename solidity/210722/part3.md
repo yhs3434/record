@@ -320,3 +320,151 @@ EVM은 변수를 저장하는 용도로 다음 네 가지 데이터 구조를 �
 - 16진수 리터럴에는 hex 키워드가 붙음. 예) hex"1A2B3F"
 - 4.5, 0.2...
 
+### 정수
+
+부호 있는 정수 : 음수 또는 양수 값을 가질 수 있음.
+부호 없는 정수 : 0 또는 양의 값을 가질 수 있음.
+
+c와 비슷하다. +, -표현을 위해 써야하는 1비트의 낭비를 줄이는 방법이다. 요즘의 device에는 사실상 공간 복잡도가 큰 의미가 없어졌지만, 이더리움의 실사용을 위해서는 굉장히 작은 공간, 시간을 절약해야 하기 때문에 고려를 하는 것 같다.
+
+``` solidity
+pragma solidity ^0.4.19;
+
+contract AllAboutInts {
+    uint stateUInt = 20;
+    uint stateInt = 20;
+
+    function getUInt(uint incomingValue) {
+        uint memoryuint = 256;
+        uint256 memoryuint256 = 256;
+        uint8 memoryuint8 = 8;
+
+        // 두 개의 uint8을 더함
+        uint256 result = memoryuint8 + memoryuint8;
+
+        // assignAfterIncrement = 9이고 memoryuint8 = 9
+        uint256 assignAfterIncrement = ++memoryuint8;
+
+        // assignBeforeIncrement = 9이고 memoryuint8 = 10
+        uint256 assignBeforeIncrement = memoryuint8++;
+    }
+
+    function getInt(int incomingValue) {
+        int memoryInt = 256;
+        int256 memoryInt256 = 256;
+        int8 memoryInt8 = 8;
+    }
+}
+```
+
+### 불린
+
+다른 프로그래밍 언어와 유사, but 다른 프로그래밍 언어와는 달리 솔리디티의 불린은 정수로 변환되지 않음.
+
+bool의 기본값은 false.
+
+``` solidity
+pragma solidity ^0.4.19;
+
+contract BoolContract {
+    bool isPaid = true;
+
+    function manageBool() returns (bool) {
+        isPaid = false;
+        return isPaid;  // false를 반환
+    }
+
+    function convertToUint() returns (uint8) {
+        isPaid = false;
+        return uint8(isPaid);   // 오류
+    }
+}
+```
+
+### 바이트 자료형
+
+바이트란 8비트의 부호 있는 정수를 가리킨다.
+bytes1 자료형은 1바이트이고, bytes2 자료형은 2바이트이다.
+솔리디티에서 byte형은 bytes1에 대한 별칭이다.
+
+``` solidity
+pragma solidity ^0.4.19;
+
+contract BytesContract {
+    bytes1 aa = 0x65;
+    bytes1 bb = 10;
+    bytes2 cc = 256;
+    bytes1 dd = 'a';
+    bytes1 ee = -100;
+
+    function getintaa() returns (uint) {
+        return uint(aa);    // 101을 반환
+    }
+
+    function getbyteaa() returns (bytes1) {
+        return aa;          // 0x65를 반환
+    }
+
+    function getbytebb() returns (bytes1) {
+        return bb;  // 0x0a를 반환
+    }
+
+    function getintbb() returns (uint) {
+        return uint(bb);    // 10을 반환
+    }
+
+    function getbytecc() returns (bytes2) {
+        return cc;  // 0x0100을 반환
+    }
+
+    function getintcc() returns (uint) {
+        return uint(cc);    // 256을 반환
+    }
+
+    function getbytedd() returns (bytes2) {
+        return dd;      // 0x6100 또는 bytes1에 대해 0x61을 반환
+    }
+
+    function getintdd() returns (uint) {
+        return uint(dd);    // 97을 반환
+    }
+}
+```
+
+### 배열
+
+솔리디티에서 배열은 고정 배열과 동적 배열을 사용할 수 있다.
+
+1. 고정 배열
+
+선언할 때 크기가 정해진 것.
+
+예.
+int[5] age;
+byte[4] flags;
+
+고정 배열은 new 키워드로 초기화할 수 없고, 아래 코드와 같이 인라인으로만 초기화할 수 있다.
+
+int[5] age = [int(10), 20, 30, 40, 50];
+
+또한 다음과 같이 함수 내에서 인라인으로 초기화할 수도 있다.
+
+int[5] age;
+age = [int(10), 2, 3, 4, 5];
+
+2. 동적 배열
+
+동적 배열이란 그 크기가 선언 시에 확정되는 것이 아니라 실행 시간에 결정되는 배열을 가리킨다.
+
+int[] age;
+bytes[] flags;
+
+동적 배열은 인라인으로 초기화할 수도 있고 new 연산자를 사용해 초기ㅗ하할 수도 있다. 다음과 같이 선언하는 시점에 초기화할 수 있다.
+
+int[] age = [int(10), 20, 30, 40, 50];
+int[] age = new int[](5);
+
+다음과 같이 두 단계로 나눠서 나중에 함수에서 초기화할 수도 있다.
+
+int[] age;
+age = new int[](5);
