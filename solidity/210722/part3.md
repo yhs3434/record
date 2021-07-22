@@ -468,3 +468,197 @@ int[] age = new int[](5);
 
 int[] age;
 age = new int[](5);
+
+#### 특수 배열
+
+솔리디티는 다음 두 가지 특수 배열을 제공한다.
+
+1. bytes 배열
+2. String 배열
+
+    1. bytes 배열
+
+        bytes 배열은 여러 개의 bytes를 담을 수 있는 동적 배열이다. 그것은 byte []와는 다르다. byte [] 배열에서는 각 원소가 32바이트인 것과 달리, bytes는 모든 바이트를 한데 묶는다.
+
+        다음 코드와 같이 바이트의 초기 길이를 정해서 상태 변수로 선언할 수 있다.
+
+        bytes localBytes = new bytes(10);
+
+        다음과 같이 두 행의 코드로 분할할 수 있는데, 이는 앞서 배열에 대해 논의한 것과 비슷하다.
+
+        bytes localBytes;
+        localBytes = new bytes(10);
+
+        다음과 같이 bytes에 값을 직접 할당할 수 있다.
+
+        localBytes = "Ritesh Modi";
+
+        또한 스토리지에 위치한 경우에는 다음 코드와 같이 값을 푸시할 수 있다.
+
+        localBytes.push(byte(10));
+
+        또한 bytes는 읽기/쓰기 가능한 length 속성을 제공한다.
+
+        읽기 : return localBytes.length;    // length 속성을 읽음
+        쓰기 : localBytes.length = 4;   // bytes length를 4로 설정
+
+        
+        결론 : 솔리디티의 bytes 배열은 c의 char* 와 유사한 것 같다.
+
+    2. String 배열
+
+        String은 앞의 절에서 논의한 bytes 배열에 기초한 동적 자료형이다. String은 bytes와 거의 비슷하며 추가적인 제약이 있다. String에서는 index나 push를 사용할 수 없고, length 속성도 없다. String 변수에 이러한 작업을 하려면 bytes로 변환해서 작업한 다음, 다시 string으로 변환해야 한다.
+
+        string name = "Ritesh Modi";
+
+        다음과 같이 String을 bytes로 변환할 수 있다.
+        bytes byteName = bytes(name);
+
+    - 배열 속성
+
+        - index : 개별 원소를 읽는데 사용되는 속성.
+        - push : 이 속성은 동적 배열에서만 지원한다.
+        - length : 이 속성은 읽기를 위한 것으로, 문자열 타입을 제외한 모든 배열에서 지원한다. length 속성의 수정은 동적 배열과 bytes만 가능하다.
+
+### 배열의 구조체
+
+    구조체는 어떠한 프로그래밍 로직이나 실행 코드도 포함하지 않고, 오직 변수 선언만 포함한다. 솔리디티에서 구조체는 참조형이며 복합형처럼 다뤄진다.
+
+    ``` solidity
+    pragma solidity ^0.4.19;
+
+    contract GeneralStructure {
+        struct myStruct {
+            string name;
+            uint myAge;
+            bool isMarried;
+            uint[] bankAccountsNumbers;
+        }
+
+        myStruct stateStructure = myStruct("Ritesh", 10, true, new uint[](2));
+
+        myStruct stateStructure1;
+
+        function getAge() returns (uint) {
+            myStruct memory localStructure = myStruct("Modi", 20, false, new uint[](2));
+
+            myStruct pointerStructure = stateStructure;
+
+            myStruct memory pointerLocalStructure = localStructure;
+
+            localStructure.myAge = 30;
+
+            stateStructure1 = myStruct("Ritesh", 10, true, new uint[](2));
+
+            return pointerLocalStructure.myAge; // 30을 반환
+        }
+    }
+    ```
+
+### 열거형
+
+    web3와 DApp은 계약 내에 선언된 enum을 이해하지 못한다.
+
+    ``` solidity
+    pragma solidity ^0.4.19;
+
+    contract Enums {
+        enum status {created, approved, provisioned, rejected, deleted};
+
+        status myStatus = status.provisioned;
+
+        function returnEnum() returns (status) {
+            status stat = status.created;
+            return stat;
+        }
+
+        function returnEnumInt() returns (uint) {
+            status stat = status.approved;
+            return uint(stat);
+        }
+
+        function passByValue() returns (uint) {
+            status stat = myStatus;
+            myStatus = status.rejected;
+
+            return uint(myStatus);
+        }
+
+        function assignInteger() returns (uint) {
+            status stat = myStatus;
+
+            myStatus = status(2);
+
+            return uint(mySTatus);
+        }
+    }
+    ```
+
+### 주소
+
+    이더를 계정에 송금할 때는 send 함수보다 transfer 함수를 사용.
+
+    또한 주소에는 계약 함수를 호출하는 세 가지 함수가 존재.
+    - Call
+    - DelegateCall
+    - Callcode
+
+
+### 매핑
+
+    매핑은 다른 언어에서의 해시 테이블 또는 딕셔너리와 유사하다.
+
+    매핑의 예.
+    Mapping ( uint => address ) Names;
+
+    솔리디티에서는 매핑에 대해 직접적으로 이터레이션을 할 수 없다. 계약에서 키의 역할을 하는 것이 uint 형의 counter 이고, 함수의 도움을 받아 addressDetails를 저장 및 조회할 수 있다.
+
+    ``` solidity
+    pragma solidity ^0.4.19;
+
+    contract GeneralMapping {
+        mapping (uint => address) Names;
+
+        uint counter;
+
+        function addToMapping(address addressDetails) returns (uint) {
+            counter = counter + 1;
+            Names[counter] = addressDetails;
+
+            return counter; // false를 반환. 엥?
+        }
+
+        function getMappingMember(uint id) returns (address) {
+            return Names[id];
+        }
+    }
+    ```
+
+    매핑은 기본적으로 메모리 위치가 타입 스토리지인 상태 변수로서만 선언할 수 있다. 따라서 매핑은 함수 내에서 메모리 매핑으로 선언할 수 없다. 그러나 상태 변수에서 선언된 매핑을 참조하는 경우에는 매핑을 함수 내에서 선언할 수 있다.
+
+    ``` solidity
+    pragma solidity ^0.4.19;
+
+    contract MappingMemory {
+        mapping (uint => address) Names;
+
+        uint counter;
+
+        function addToMapping(address addressDetails) returns (uint) {
+            counter = counter + 1;
+            mapping (uint => address) localNames = Names;
+
+            localNames[counter] = addressDetails;
+
+            return counter;
+        }
+
+        function getMappingMember(uint id) returns (address) {
+            return Names[id];
+        }
+    }
+    ```
+
+    중첩 매핑 가능하다.
+
+    mapping (uint => mapping(address => string)) accountDetails;
