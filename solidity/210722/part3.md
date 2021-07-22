@@ -188,3 +188,135 @@ EVM은 변수를 저장하는 용도로 다음 네 가지 데이터 구조를 �
     }
     ```
 
+6. 규칙 6
+
+    다른 메모리 변수로부터 스토리지 변수에 할당할 때는 항상 새로운 사본이 생성된다.
+
+    uint 고정 배열 stateArray가 상태 변수로서 선언된다. getUInt 함수에서 로컬 메모리에 위치하는 uint 고정 배열 localArray가 정의 및 초기화된다. 그 다음 행에서는 localArray를 stateArray에 할당한다. 이 단계에서는 두 변수의 값이 같다. 그 다음 행에서 localArray의 원소 중 하나의 값을 10으로 변경하고 stateArray1 배열에서 같은 위치의 원소를 반환한다. 반환되는 값은 2로, 각 변수가 독립적인 값을 유지하는 것을 볼 수 있다.
+
+    ``` solidity
+    pragma solidity ^0.4.19;
+
+    contract DemoMemoryToStorageReferenceTypeAssignment {
+        uint[2] stateArray;
+
+        function getUInt() returns (uint) {
+            uint[2] memory localArray = [uint(1), 2];
+            stateArray = localArray;
+            localArray[1] = 10;
+            return stateArray[1];   // 2를 반환
+        }
+    }
+    ```
+    
+    규칙 5에서와 마찬가지의 이유로 이렇게 하는 듯?
+
+    값 타입의 상태 변수 stateVar를 선언하고 값을 20으로 초기화한다. getUInt 함수 내에서 로컬 변수 localVar를 값 40으로 선언한다. 그 다음 행에서 로컬 변수 localVar를 stateVar에 할당한다. 이 단계에서 두 변수의 값은 40이다. localVar의 값을 50으로 변경한 다음, stateVar를 반환한다. 반환되는 값은 40으로, 각 변수가 독립적인 값을 유지하는 것을 볼 수 있다.
+
+    ``` solidity
+    pragma solidity ^0.4.19;
+
+    contract DemoMemoryToStorageValueTypeAssignment {
+        uint stateVar = 20;
+
+        function getUInt() returns (uint) {
+            uint localVar = 40;
+            stateVar = localVar;
+            localVar = 50;
+            return stateVar; // 40을 반환
+        }
+    }
+    ```
+
+    이 건 다른 언어와 비슷하다. 이렇게 되는 이유는 storage에 저장하기 때문.
+
+7. 규칙 7
+
+    다른 상태 변수로부터 메모리 변술늘 할당할 때는 항상 새로운 사본이 만들어진다. 아래 예제 코드에서 값 유형의 상태 변수 stateVar가 선언되고 그 값은 20으로 초기화된다. getUInt 함수 내에 uint 형의 지역 변수가 선언되고 그 값은 40으로 초기화된다. stateVar 변수가 localVar 변수에 할당된다. 이 시점에 두 변수의 값은 20이다. 그 후 stateVar의 값은 50으로 변경되고 localVar가 반환된다. 반환되는 값은 20으로, 각 변수가 독립적으로 값을 유지하는 것을 보여준다.
+
+    ``` solidity
+    pragma solidity ^0.4.19;
+
+    contracct DemoStorageToMemoryValueTypeAssignment {
+        uint stateVar = 20;
+        function getUInt() returns (uint) {
+            uint localVar = 40;
+            localVar = stateVar;
+            stateVar = 50;
+            return localVar; // 20을 반환
+        }
+    }
+    ```
+
+    규칙 6과 같은 원리. 단지 거꾸로 됐을 뿐이다.
+
+    uint 고정 배열 stateArray가 상태 변수로 선언된다. getUInt 함수 내에서 로컬 메모리에 위치한 uint 고정 배열 localArray가 정의되고 stateArray 변수로 초기화된다. 이 단계에서 두 변수의 값은 같다. 그 다음 행에서 stateArray의 한 원소의 값을 5로 변경하고 localArray1 배열의 같은 위치에 있는 원소의 값을 반환한다. 반환되는 값은 2로, 각 변수가 독립적인 값을 유지하는 것을 보여준다.
+
+    ```solidity
+    pragma solidity ^0.4.19;
+
+    contract DemoStorageToMemoryReferenceTypeAssignment {
+        uint[2] stateArray = [uint(1), 2];
+
+        function getUInt() returns (uint) {
+            uint[2] memory localArray = stateArray;
+            stateArray[1] = 5;
+            return localArray[1];   // 2를 반환
+        }
+    }
+    ```
+
+    위와 동일.
+
+8. 규칙 8
+
+    다른 메모리 변수로부터 메모리 변수에 할당할 때는 참조 타입에 대한 사본을 생성하지 않고, 값 타입에 대한 새로운 사본을 생성한다. 다음 예제 코드는 메모리 내의 값 타입 변수가 값에 의해 복사되는 것을 보여준다. localVar1의 값은 localVar2 변수의 값이 변경되는 것에 영향을 받지 않는다.
+
+    ``` solidity
+    pragma solidity ^0.4.19;
+
+    contract DemoMemoryToMemoryValueTypeAssignment {
+        function getUInt() returns (uint) {
+            uint localVar1 = 40;
+            uint localVar2 = 80;
+            localVar1 = localVar2;
+            localVar2 = 100;
+            return localVal1;   // 80을 반환
+        }
+    }
+    ```
+
+    다른 언어들과 동일.
+
+    다음 예제 코드는 메모리 내의 참조 타입 변수가 참조에 의해 복사되는 것을 보여준다. otherVar의 값은 someVar 변수가 변경되는 것에 영향을 받는다.
+
+    ``` solidity
+    pragma solidity ^0.4.19;
+
+    contract DemoMemoryToMemoryReferenceTypeAssignment {
+        uint stateVar = 20;
+
+        function getUInt() returns (uint) {
+            uint[] memory someVar = new uint[](1);
+            someVar[0] = 23;
+            uint[] memory otherVar = someVar;
+            someVar[0] = 45;
+            return (otherVar[0])    // 45를 반환
+        }
+    }
+    ```
+
+    이 경우는 참조형으로 돌아간다. java, python, javascript의 배열과 유사한 방식으로 돌아감.
+
+### 리터럴
+
+리터럴은 프로그램의 시작부터 끝까지 동일한 값을 유지함.
+
+종류
+
+- 1, 10, 100.... (정수)
+- "Ritesh", "modi" (문자열, 작은 따옴표도 가능)
+- 0xca35d39gffnbfko34385~~~ (address)
+- 16진수 리터럴에는 hex 키워드가 붙음. 예) hex"1A2B3F"
+- 4.5, 0.2...
+
