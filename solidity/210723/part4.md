@@ -187,3 +187,65 @@ contract TransactionAndMessageVariables {
     }
 }
 ```
+
+- 거래 및 메시지 글로벌 변수
+
+    + block.coinbase (address)
+    + block.difficulty (uint)
+    + block.gaslimit (uint)
+    + block.number (uint)
+    + block.timestamp (uint)
+    + msg.data (bytes)
+    + msg.gas (uint)
+    + msg.sender (address)
+    + msg.sig (bytes4)
+    + msg.value (uint)
+    + now (uint)
+    + tx.gasprice (uint)
+    + tx.origin (address)
+    + block.blockhash(uint blockNumber)
+
+- tx.origin과 msg.sender의 차이
+
+    + tx.origin : 전역 변수가 거래를 시작한 원본 외부 계정을 참조
+    + msg.sender : 그 함수를 호출한 계정을 참조.
+
+    결론 : tx.origin 보다는 msg.sender를 사용할 것을 권장.
+
+
+### 암호화 함수
+
+솔리디티는 계약 함수 내에 해싱을 위한 암호 함수를 제공한다. 해시 알고리즘에는 SHA2와 SHA3가 있다.
+
+해시가 필요할 때는 keccak256 또는 sha3 함수를 사용할 것을 권장한다.
+
+``` solidity
+pragma solidity ^0.4.19;
+
+contract CryptoFunctions {
+    function cryptoDemo() returns (bytes32, bytes32, bytes32) {
+        return (sha256("r"), keccak256("r"), sha3("r"));
+    }
+}
+```
+
+
+### 주소 전역 변수
+
+함수 종류 (5가지)
+
+- <주소>.transfer(uint256 금액)
+- <주소>.send(uint 256 금액) returns (bool)
+- <주소>.call(...) returns (bool)
+- <주소>.callcode(...) returns (bool)
+- <주소>.delegatecall(...) returns (bool)
+
+변수
+
+- balance
+
+### 계약 전역 변수
+
+- this
+- selfdestruct: 현잭 ㅖ약을 파기하는 주소를 수령, 자금을 주어진 주소로 보냄
+- suicide : selfdestruct의 별칭으로 주소를 수령
