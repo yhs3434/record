@@ -278,3 +278,158 @@ myaddr.call(bytes4(sha3("SetBalance(uint256)")), 10);
 - SetBalance : 한 개의 상태 변수를 가지며, 호출할 때마다 상태 변수에 10을 더한다.
 - GetBalance : 상태 변수의 현재 값을 반환하는 함수다.
 
+또 다른 계약 usingCall이 생성되어 call 함수를 통해 EtherBox 계약의 메서드를 호출한다. 다음 코드 예제에서는 다음과 같은 함수들을 살펴보겠다.
+
+1. SimpleCall : 이 함수는 EtherBox 계약의 인스턴스를 생성하고, 그것을 주소로 변환한다. 이 주소를 가지고 call 함수를 사용해 EtherBox 계약의 SetBalance 함수를 호출한다.
+
+2. SimpleCallWithGas : 이 함수는 EtherBox 계약의 인스턴스를 생성하고 그것을 주소로 변환한다. 이 주소를 가지고 call 함수를 사용해 EtherBox의  SetBalance 함수를 호출한다. call과 함께 가스도 보내며, 가스가 더 필요할 경우에 함수 실행이 완료될 수 있다.
+
+3. SimpleCallWithGasAndValue: 이 함수는 EtherBox 계약의 인스턴스를 생성하고 그것을 주소로 변환한다. 이 주소를 가지고 call 함수를 사용해 EtherBox의 SetBalance 함수를 호출한다. call과 함께 가스도 보내며, 가스가 더 필요할 경우에 함수 실행이 완료될 수 있다. 가스와 별개로 이더 혹은 웨이를 payable 함수에 보낼 수도 있다.
+
+다음 코드에서 이러한 함수들을 살펴보자.
+
+``` solidity
+pragma solidity ^0.4.17;
+
+contract EtherBox {
+    uint balance;
+
+    function SetBalance() public {
+        balance = balance + 10;
+    }
+
+    function GetBalance() public payable returns (uint) {
+        return balance;
+    }
+}
+
+contract UsingCall {
+    function UsingCall() public payable {
+
+    }
+
+    function SimpleCall() public returns (uint) {
+        bool status = true;
+        EtherBox eb = new EtherBox();
+        address myaddr = address(eb);
+        status = myaddr.call(bytes4(sha3("SetBalance()")));
+        return eb.GetBalance();
+    }
+
+    function SimpleCallwithGas() public returns (bool) {
+        bool status = true;
+        EtherBox eb = new EtherBox();
+        address myaddr = address(eb);
+        status = myaddr.call.gas(200000)(bytes4(sha3("GetBalance()")));
+    }
+
+    function SimpleCallwithGasAndValue() public returns (bool) {
+        bool status = true;
+        EtherBox eb = new EtherBox();
+        address myaddr = address(eb);
+        status = myaddr.call.gas(200000).value(1)(bytes4(sha3("GetBalance()")));
+        return status;
+    }
+}
+```
+
+
+#### callcode 메서드
+
+폐기 예정.
+
+
+#### delegatecall 메서드
+
+이 함수는 호출자의 상태 변수를 사용해 다른 계약 내의 함수를 호출하는 저수준 함수다. 이 함수는 솔리디티의 라이브러리를 통해 사용하는 것이 일반적이다.
+
+
+### 폴백 함수
+
+폴백 함수는 이더리움에만 있는 특수한 함수다. 솔리디티는 폴백 함수를 작성하도록 돕는다. 독자가 솔리디티 개발자이며, 스마트 계약의 함수를 호출한다고 하자. 계약 내에 존재하지 않는 함수명을 사용하는 경우가 있을 수 있다. 그러한 경우에 폴백 함수가 자동으로 호출된다.
+
+호출된 함수와 이름이 일치하는 함수가 없을 때 폴백 함수가 호출된다.
+
+폴백 함수에는 식별자 또는 함수명이 없다. 이름 없이 정의되는 것이다. 명시적으로 호출할 수 없으므로, 인자도 갖지 않으며 값을 반환하지도 않는다. 다음의 예에서 폴백 함수를 볼 수 있다.
+
+``` solidity
+pragma solidity ^0.4.17;
+
+contract FallbackFunction {
+    function () {
+        var a = 0;
+    }
+}
+```
+
+계약에서 이더를 받을 때도 폴백 함수가 호출될 수 있다. 이것은 종종 한 계정에서 계약으로 이더를 보내기 위해 web3에서 사용 가능한 SendTransaction 함수를 사용해 일어난다. 이 경우 폴백 함수는 payable이어야 하며, 그렇지 않으면 이더를 수취할 수 없고 오류를 발생시킨다.
+
+다음으로 생각해봐야 할 중요한 점은 이 함수를 실행하는데 가스가 얼마나 드는가다. 그것은 명시적으로 호출될 수 없으므로, 이 함수에 가스를 보낼 수는 없다. 그 대신 EVM은 이 함수에 2,300 가스를 제공한다. 이 제한을 초과해서 가스를 소비하면 예외가 발생하며 모든 가스가 원래 함수와 함께 보내진 후 상태가 롤백된다. 그러므로 폴백 함수가 2,300 가스 이상을 소비하지 않는지 테스트하는 것이 중요하다.
+
+또한 스마트 계약에 있어 폴백 함수는 보안상의 허점을 만드는 주요 원인 중 하나임에 유의하자. 계약을 프로덕션에 릴리스하기 전에 이 함수를 테스트 하는 것은 보안 관점에서 매우 중요하다.
+
+몇 가지 예를 통해 폴백 함수를 이해해보자.
+
+주소 자료형의 call 함수를 설명할 때, 사용한 예제를 바탕으로 EtherBox 계약에서 payable 폴백 함수를 구현했다. 이것은 이벤트를 발생시키고 유효하지 않은 함수를 호출한다. 이벤트는 함수 내에서도 선언된다. 다음 장에서 이벤트를 좀 더 깊이 살펴본다.
+
+UsingCall 계약에는 폴백 함수를 호출하는 함수가 없지만 올바른 함수를 호출하지 않는 경우에 폴백 함수가 동작한다. 다음 예제 코드를 보자.
+
+``` solidity
+pragma solidity ^0.4.17;
+
+contract EtherBox {
+    uint balance;
+    event logme(string);
+
+    function SetBalance() public {
+        balance = balance + 10;
+    }
+
+    function GetBalance() public payable returns (uint) {
+        return balance;
+    }
+
+    function() payable {
+        logme("fallback called");
+    }
+}
+
+contract UsingCall {
+    function UsingCall() public payable {
+
+    }
+
+    function SimpleCall() public returns (uint) {
+        bool status = true;
+        EtherBox eb = new EtherBox();
+        address myaddr = address(eb);
+        status = myaddr.call(bytes4(sha3("SetBalance()")));
+        return eb.GetBalance();
+    }
+
+    function SimpleCallwithGas() public returns (bool) {
+        bool status = true;
+        EtherBox eb = new EtherBox();
+        address myaddr = address(eb);
+        status = myaddr.call.gas(200000)(bytes4(sha3("GetBalance()")));
+        return status;
+    }
+
+    function SimpleCallwithGasAndValue() public returns (bool) {
+        bool status = true;
+        EtherBox eb = new EtherBox();
+        address myaddr = address(eb);
+        status = myaddr.call.gas(200000).value(1)(bytes4(sha3("GetBalance()")));
+        return status;
+    }
+
+    function SimpleCallWithGasAndValueWithWrongName() public returns (bool) {
+        bool status = true;
+        EtherBox eb = new EtherBox();
+        address myaddr = address(eb);
+        return myaddr.call.gas(200000).value(1)(bytes4(sha3("GetBalance1()")));
+    }
+}
+```
+
+폴백 함수는 send 메서드, web3의 SendTransaction 함수 또는 transfer 메서드를 사용할 때도 호출된다.
