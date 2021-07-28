@@ -22,7 +22,7 @@ const Title = styled.Text`
         isFilled ? theme.buttonTitle : theme.buttonUnfilledTitle};
 `;
 
-const Button = ({containerStyle, title, onPress, isFilled}) => {
+const Button = ({containerStyle, title, onPress, isFilled, disabled}) => {
     return (
         <Container
             style={containerStyle}
