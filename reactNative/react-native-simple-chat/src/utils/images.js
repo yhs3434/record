@@ -2,4 +2,5 @@ const prefix = 'https://firebasestorage.googleapis.com/v0/b/react-native-simple-
 
 export const images = {
     logo: `${prefix}/loading.jpg?alt=media`,
+    photo: `${prefix}/photo.jpg?alt=media`,
 };
