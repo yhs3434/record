@@ -41,3 +41,54 @@
 ## 솔리디티 학습
 
 이하 '솔리디티 프로그래밍 에센셜' 책에서 학습한 내용들 소개.
+
+유닛 멀티플라이어를 이용하면 컨트랙트의 가독성을 향상할 수 있음.
+
+``` solidity
+require(withdraw_amount <= 100000000000000000);
+// =>
+require(withdraw_amount <= 0.1 ether);
+```
+
+## 사전 정의된 글로벌 변수 및 함수
+
+- msg.sender : 이 컨트랙트 호출을 시작한 주소.
+- msg.value : 이 호출과 함께 전송된 이더의 값(웨이)
+- msg.gas : 이 실행 환경의 가스 공급에 남은 가스의 양.
+- msg.data : 이 호출의 데이터 페이로드
+- msg.sig : 함수 선택자인 데이터 페이로드의 처음 4바이트.
+- tx.gasprice : 트랜잭션을 호출하는 데 필요한 가스 가격
+- tx.origin : 이 트랜잭션에 대한 원래 EOA의 주소
+- block.blockhash : 블록 번호의 블록 해시. 더이상 사용 x
+- block.coinbase : 현재 블록 수수료 및 보상의 수취인 주소.
+- block.difficulty : 현재 블록의 난이도
+- block.gaslimit : 현재 블록에 포함된 모든 트랜잭션에 소요될 수 있는 최대 가스양
+- block.number : 현재 블록 넘버
+- block.timestamp : 채굴자가 현재 블록에 넣은 타임스탬프
+- address.balance : 웨이로 표현된 주소의 잔액.
+- address.transfer(amount) : 이 주소로 금액을 전송.
+- address.send(amount) : 위와 동일한 기능, but 예외 발생이 아닌 boolean 반환.
+- address.call(payload) : 저수준 CALL함수.
+- address.callcode(payload) : 위와 동일.
+- address.delegatecall() : 위와 동일.
+
+### 내장 함수
+
+- addmod, mulmod : 모듈로 더하기 곱하기.
+- keccak256, sha256, sha3, ripemd160 : 해시 알고리즘
+- ecrecover : 서명에서 메시지 서명에 사용된 주소를 복구.
+- selfdestrunct(recipient_address) : 현재 컨트랙트를 삭제하고 계정의 나머지 이더를 받는 사람 주소로 보냄.
+- this : 현재 실행 중인 컨트랙트 계정의 주소
+
+## 컨트랙트 정의
+
+솔리디티의 주요 데이터 타입은 contract이다. Faucet 예제는 단순히 contract 객체를 정의한다. 객체 지향 언어의 객체와 마찬가지로, 컨트랙트는 데이터와 메소드가 포함된 컨테이너다.
+
+솔리디티는 컨트랙트와 유사한 두 가지 객체 유형을 제공한다.
+
+- interface : 인터페이스 정의는 함수가 정의되어 있지 않고 선언만 되어 있다는 것을 제외하면 컨트랙트와 완전히 같은 구조로 되어 있다. 이런 유형의 선언은 흔히 스텁이라고 불린다. 어떤 구현도 없이 함수의 인자와 반환 유형을 알려준다. 인터페이스는 컨트랙트의 형태를 지정한다. 상속될 때 인터페이스에 의해 선언된 각 함수는 자식에 의해 정의되어야 한다.
+
+- library : 라이브러리 컨트랙트는 delegatecall 메서드를 사용하여 한 번만 배포되고 다른 컨트랙트에서 사용되기 위한 컨트랙트다.
+
+## 함수
+
