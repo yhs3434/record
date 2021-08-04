@@ -203,3 +203,70 @@ modifier onlyOwner {
 ```
 
 이 함수 변경자는 이름이 onlyOwner이고 이를 적용하는 모든 함수에 다음의 조건을 설정한다. 컨트랙트의 owner로 저장된 주소가 트랜잭션의 msg.sender 주소와 동일해야 한다. 이것은 접근 제어를 위한 기본 디자인 패턴으로, 오직 컨트랙트 소유자만 onlyOwner 변경자를 가진 모든 함수를 실행할 수 있게 해준다.
+
+## 컨트랙트 상속
+
+솔리디티의 contract 객체는 바탕이 되는 컨트랙트에 기능들을 추가해서 확장하기 위한 메커니즘인 상속을 지원한다. 상속을 사용하려면 부모 컨트랙트에 is 키워드를 지정하라.
+
+``` solidity
+contract Child is Parent {
+
+}
+```
+
+이 구조는 Child 컨트랙트가 Parent의 모든 메서드, 기능 및 변수를 상속한다. 솔리디티는 컨트랙트명을 키워드 is 뒤에 콤마로 구분해서 다중 상속도 지원한다.
+
+``` solidity
+contract Child is Parent1, Parent2 {
+
+}
+```
+
+컨트랙트 상속을 통해서 모듈성, 확장성, 재사용을 달성할 수 있는 방법으로 컨트랙트를 작성 할 수 있다. 단순하고 가장 일반적인 기능을 구현한 컨트랙트로 시작한 다음, 좀 더 전문화된 컨트랙트로 이러한 기능을 상속하여 확장한다.
+
+우리는 Faucet 컨트랙트 생성에 할당된 소유자에 대한 접근 제어와 함께 생성자와 소멸자를 적용했다. 이러한 기능은 매우 일반적이라 많은 컨트랙트가 그렇게 할 것이다. 일반 컨트랙트로 정의한 후에 상속을 사용하여 컨트랙트를 확장할 수 있다.
+
+owner 변수가 있는 owned 컨트랙트를 정의하고 컨트랙트의 생성자에서 owner를 설정한다.
+
+``` solidity
+contract owned {
+    address owner;
+
+    constructor() {
+        owner = msg.sender;
+    }
+
+    modifier onlyOwner {
+        require(msg.sender == owner);
+        _;
+    }
+}
+```
+
+그리고서 owned를 상속한 기본 컨트랙트인 mortal을 정의한다.
+
+``` solidity
+contract mortal is owned {
+    function destroy() public onlyOwner {
+        selfdestruct(owner);
+    }
+}
+```
+
+보다시피, mortal 컨트랙트는 owned에서 정의한 onlyOwner 함수 변경자를 사용할 수 있다. 또한 간접적으로 owner 주소 변수와 owned에서 정의된 생성자를 사용한다. 상속은 각 컨트랙트를 더 단순하게 만들고 특정 기능에 중점을 두어 모듈 방식으로 세부사항을 관리할 수 있게 만든다.
+
+이제 우리는 Faucet에서 상속한 owned의 기능에 더해 owned의 컨트랙트를 좀 더 확장할 수 있다.
+
+``` solidity
+contract Faucet is mortal {
+    function withdraw(uint withdraw_amount) public {
+        require(withdraw_amount <= 0.1 ether);
+        msg.sender.transfer(withdraw_amount);
+    }
+
+    function () public payable {}
+}
+```
+
+owned를 상속받은 mortal을 상속받음으로써 이제 Faucet 컨트랙트는 생성자와 destroy 함수 그리고 소유자가 정의한 것들을 갖는다. 기능적으로는 Faucet 내의 기능과 동일하지만, 해당 기능은 다른 컨트랙트에서 다시 작성될 필요 없이 재사용할 수 있다. 코드 재사용과 모듈화는 코드를 명확하고, 읽기 쉽고, 감사하기 쉽게 만든다.
+
