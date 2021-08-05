@@ -129,6 +129,7 @@ contract Token is mortal {
 
 여러분은 또한 Faucet 함수들을 호출할 수 있다. 예를 들어, Token의 destory 함수 내에서 Faucet의 destroy 함수를 호출할 수 있다.
 
+``` solidity
 import "Faucet.sol";
 
 contract Token is mortal {
@@ -146,3 +147,151 @@ contract Token is mortal {
 
 Token 컨트랙트 소유자인 경우 Token 컨트랙트 자체가 새로운 Faucet 컨트랙트를 소유하므로 Token 컨트랙트는 Faucet을 파기할 수 있다.
 
+## 존재하는 인스턴스에 주소 부여하기
+
+다른 컨트랙트를 호출할 수 있는 또 다른 방법은 이미 존재하는 해당 컨트랙트의 인스턴스에 주소를 캐스팅하는 방법이다. 이 방법을 통해 이미 존재하는 인스턴스에 알고 있는 인터페이스를 적용할 수 있다. 그래서 주소를 적용하려는 인스턴스의 유형이 실제 여러분이 가정하고 있는 것인지 확인하는 것이 매우 중요하다.
+
+``` solidity
+import "Faucet.sol";
+
+contract Token is mortal {
+    Faucet _faucet;
+
+    constructor(address _f) {
+        _faucet = Faucet(_f);
+        _faucet.withdraw(0.1 ether);
+    }
+}
+```
+
+여기서는 생성자 _f에 대한 인수로 제공된 주소를 가져와서 Faucet 객체로 형변환을 한다. 이는 실제로 주소가 Faucet 객체인지 여부를 확실히 알 수 없기 때문에 이전 메커니즘보다 훨씬 위험하다. withdraw를 호출하면 동일한 인수를 받아들이고 Faucet 선언과 동일한 코드를 실행한다고 가정하지만 확신할 수는 없다. 알다시피 이 주소의 withdraw 함수는 우리가 기대한 것과 전혀 다른 어떤 것을 실행할 수 있다. 따라서 입력으로 전달된 주소를 사용하여 특정 객체에 형변환을 하는 것은 컨트랙트를 직접 작성하는 것보다 훨씬 위험하다.
+
+### 원시 call, delegatecall
+
+솔리디티는 다른 컨트랙트를 호출하기 위한 '저수준'의 함수를 제공한다. 이는 동일한 이름의 EVM 연산코드에 직접적으로 대응하고 컨트랙트 간의 호출을 수동으로 구성할 수 있게 해준다. 따라서 다른 컨트랙트를 호출할 때 가장 유연하면서도 가장 위험한 메커니즘을 나타낸다.
+
+여기에 call 메서드를 사용한 예제가 있다.
+
+``` solidity
+contract Token is mortal {
+    constructor(address _faucet) {
+        _faucet.call("withdraw", 0.1 ether);
+    }
+}
+```
+
+보다시피 이러한 call 형태는 함수 안에 숨은 호출이며, 원시 트랜잭션을 생성하는 것과 매우 비슷하다. 이는 컨트랙트의 컨텍스트에서 발생하고 컨트랙트를 여러 보안 위험에 노출 시킬 수 있는데, 가장 중요한 문제는 재진입성이다. 자세한 내용은 '재진입성'절에서 논의할 것이다. call 함수는 어떤 문제가 있을 경우 false를 반환하기 때문에 에러 처리를 하기 위해서는 그 반환 값을 조사해야 한다.
+
+``` solidity
+contract Token is mortal {
+    constructor(address _faucet) {
+        if !(_faucet.call("withdraw", 0.1 ether)) {
+            revert("Withdrawal from faucet failed");
+        }
+    }
+}
+```
+
+호출의 또 다른 변형은 delegatecall이다. 이것은 이보다 더 위험한 방식인 callcode를 대체하기 위해 나왔다. callcode 메서드는 곧 사라질 것이므로 사용하지 말아야 한다.
+
+'address 객체' 절에서 언급했듯이, delegatecall은 msg 컨텍스트가 변경되지 않는다는 점에서 call과 다르다. 예를 들어 call은 msg.sender의 값을 호출하는 컨트랙트로 변경하지만, delegatecall은 호출하는 컨트랙트와 동일한 msg.sender를 유지한다. 본질적으로 delegatecall은 현재 컨트랙트의 컨텍스트 내에서 다른 컨트랙트의 코드를 실행한다. 이것은 주로 라이브러리의 코드를 생성할 때 사용한다. 또한, 다른 곳에 저장된 라이브러리 함수를 사용하되 이 함수가 처리해야 되는 데이터는 여러분의 컨트랙트에 저장된 것을 사용하도록 하는 패턴도 가능하게 한다.
+
+delegatecall은 매우 조심해서 사용해야 한다. 특히 여러분이 호출하는 컨트랙트가 라이브러리로 설계되지 않은 경우에는 예상치 못한 결과를 가져올 수 있다.
+
+call과 delegatecall에서 사용되는 다양한 호출 의미를 설명하기 위해 예제 라이브러리를 사용해 보자.
+
+``` solidity
+pragma solidity ^0.4.22;
+
+contract calledContract {
+    event callEvent(address sender, address origin, address from);
+    function calledFunction() public {
+        emit callEvent(msg.sender, tx.origin, this);
+    }
+}
+
+library calledLibrary {
+    event callEvent(address sender, address origin, address from);
+    function calledFunction() public {
+        emit callEvent(msg.sender, tx.origin, this);
+    }
+}
+
+contract caller {
+    function make_calls(calledContract _calledContract) public {
+        _calledContract.calledFunction();
+        calledLibrary.calledFunction();
+
+        require(address(_calledContract).call(bytes4(keccak256("calledFunction()"))));
+        require(address(_callCOntract).delegatecall(bytes4(keccak256("calledFunction()"))));
+    }
+}
+```
+
+예제에서 볼 수 있듯이, 주 컨트랙트는 caller이고 caller는 calledContract 컨트랙트와 calledLibrary 라이브러리를 호출한다. 호출된 컨트랙트와 라이브러리는 calledEvent 이벤트를 발생시키기 위한 동일한 calledFunction 함수를 갖는다. calledEvent는 msg.sender, tx.origin, this 이렇게 3개의 데이터를 로깅한다. calledFunction을 호출할 때마다 직접 호출했는지 아니면 delegatecall을 통해 호출했는지에 따라서 다른 실행 컨텍스트를 가질 수 있다.
+
+caller에서 우선 컨트랙트와 라이브러리를 직접 호출해 보는데, 이 때 각각의 calledFunction을 실행한다. 그런 다음, 저수준 함수인 call과 delegatecall을 명시적으로 사용해서 calledContract.calledFunction을 호출해 보자. 이렇게 함으로써 다양한 호출 메커니즘이 어떻게 작동하는지 확인할 수 있다.
+
+이하 트러플 실습.
+
+## 가스 고려사항
+
+'가스' 절에서 좀 더 자세히 설명할 가스는 스마트 컨트랙트 프로그래밍에서 매우 중요한 고려사항이다. 가스는 이더리움이 트랜잭션이 사용하도록 허용할 최대 계산량을 제한하는 자원이다. 만약 계산하는 동안 가스 한계를 초과하면 다음과 같은 종류의 이벤트가 발생한다.
+
+- '가스 부족' 예외가 발생한다.
+- 실행 전의 컨트랙트 상태가 복원된다(복귀).
+- 가스를 지급하는 데 사용되는 모든 이더는 트랜잭션 수수료로 간주되고 환불되지 않는다.
+
+가스는 트랜잭션을 시작한 사용자가 지급하기 때문에 사용자는 가스 비용이 높은 함수를 호출하지 않는 것이 좋다. 따라서 프로그래머는 컨트랙트 함수들의 가스 비용을 최소화하도록 해야 한다. 이를 위해 스마트 컨트랙트를 만들 때 함수 호출의 가스 비용을 최소화하기 위해 권장하는 지침들이 있다.
+
+## 동적 크기 배열 피하기
+
+함수가 각 요소에서 연산을 수행하거나 특정 요소를 검색하는 동적 크기 배열을 통한 루프는 너무 많은 가스를 사용하는 위험을 초래한다. 실제로 컨트랙트는 원하는 결과를 찾기 전에 혹은 모든 요소에 적용하기 전에 가스가 소진될지도 모른다. 그러면 아무런 결과 없이 시간과 이더를 낭비하는 셈이다.
+
+## 다른 컨트랙트 호출 피하기
+
+다른 컨트랙트를 호출하는 것은, 특히 그들 함수의 가스 비용이 알려져 있지 않을 때는 가스가 고갈될 위험이 있다. 잘 테스트되지 않고 광범위하게 사용되지 않는 라이브러리는 사용을 피해라. 다른 프로그래머들로부터 받은 점검이 덜 된 라이브러리는 사용상 위험이 더 높다.
+
+## 가스 비용의 추정
+
+컨트랙트의 인수를 고려하여 어떤 컨트랙트 메서드를 실행하는 데 필요한 가스를 추정해야 한다면 다음의 절차를 사용할 수 있다.
+
+``` javascript
+var contract = web3.eth.contract(abi).at(address);
+var gasEstimate = contract.myAweSomeMethod.estimateGas(arg1, arg2, {from: account});
+```
+
+gasEstimate는 실행에 필요한 가스 단위수를 알려준다. 이것은 예상치에 불과한데, 그 이유는 EVM의 튜링 완전성의 특성상 하나의 함수가 여러 가지 다른 호출을 수행하기 위해 소모하는 가스양을 엄청나게 다르게 만드는 게 매우 쉽기 때문이다. 심지어 최종 프로덕션 코드조차도 실행 경로를 미묘하게 변경하여 한 호출에서 다음 호출로의 가스 비용을 크게 변경할 수 있다. 하지만 대부분의 함수는 측정할 수 있고, estimateGas는 대부분의 경우 상당히 정확한 예상치를 제공해 줄 것이다.
+
+네트워크로부터 가스 가격을 얻으려면 다음과 같이 사용할 수 있다.
+
+``` javascript
+var gasPrice = web3.eth.getGasPrice();
+```
+
+그리고 이것으로부터 가스 비용을 추정할 수 있다.
+
+``` javascript
+var gasCostInEther = web3.fromWei((gasEstimate * gasPrice), 'ether');
+```
+
+Faucet 예제의 가스 비용을 추정하기 위해 책 저장소의 코드를 사용하여 가스 추정 함수를 적용해 보자. ㅇㅋ
+
+``` javascript
+var FaucetContract = artifacts.require("./Faucet.sol");
+
+FaucetContract.web3.eth.getGasPrice(function (error, result) {
+    var gasPrice = Number(result);
+    
+    FaucetContract.deployed().then(function(FaucetContractInstance) {
+        FaucetContractInstance.send(web3.toWei(1, "ether"));
+        return FaucetContractInstance.withdraw.estimateGas(web3.toWei(0.1, "ether"));
+    }).then(function(result) {
+        var gas = Number(result);
+    });
+});
+```
+
+트러플 개발 콘소레서 다음과 같이 보일 것이다.
+
+이하 캡처본.
