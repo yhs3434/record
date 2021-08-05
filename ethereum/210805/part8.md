@@ -31,4 +31,48 @@ function changeOwner(address _newOwner) public onlyBy(owner) {
 이 변경자는 소유권과 관련된 규칙을 적용한다. 보다시피, 이 특정 변경자는 changeOwner 함수를 대신하여 사전 검사를 수행하는 메커니즘 기능을 한다.
 
 ``` solidity
-modifier onlyBy(address )
+modifier onlyBy(address _account) {
+    require(msg.sender == _account);
+    _;
+}
+```
+
+하지만 변경자는 위에서 설명한 것처럼 검사만 수행하는 것이 아니다. 사실, 변경자로서 호출 함수의 컨텍스트에서 스마트 컨트랙트의 환경에 영향을 줄 수 있다. 간단히 말해, 변경자는 다양하게 활용 가능하다.
+
+또 다른 솔리디티 스타일의 예제를 살펴보자.
+
+``` solidity
+enum Stages {
+    SafeStage,
+    DangerStage,
+    FinalStage
+}
+
+uint public creationTime = now;
+Stages public stage = Stages.SafeStage;
+
+function nextStage() internal {
+    stage = Stages(uint(stage) + 1);
+}
+
+modifier stageTimeConfirmation() {
+    if (stage == Stages.SafeStage && now >= creationTime + 10 days) {
+        nextStage();
+    }
+    _;
+}
+
+function a() public stageTimeConfirmation {
+
+}
+```
+
+개발자는 자신의 코드가 호출하는 다른 코드를 항상 확인해야 한다. 하지만 특정 상황에서는 실수로 한 줄의 코드를 놓칠 수도 있다. 만일 개발자가 함수 호출 계층을 머릿속으로 추적하고 스마트 컨트랙트의 상태를 메모리에 커밋하면서 큰 파일을 여기저기 돌아다니면서 봐야 한다면 더욱더 그렇다.
+
+이 예제를 좀 더 깊이 살펴보자. 개발자가 a라는 공개 함수를 작성한다고 상상해 보자. 개발자는 이 컨트랙트를 처음 사용해 보는 것이고, 다른 사람이 작성한 변경자를 활용한다. 얼핏 보기에 stageTimeConfirmation 변경자는 함수 호출과 관련해서 이 컨트랙트의 시간 경과에 대한 간단한 몇 가지 체크를 하는 것을 ㅗ보인다. 하지만 개발자가 미처 깨닫지 못할 수도 있는 부분은 변경자가 다른 함수(nextStage)를 호출하고 있다는 점이다. 이 간단한 데모 시나리오에서 단순히 공개 함수 a를 호출한 것이 스마트 컨트랙트상의 stage 변수를 SafeStage에서 DangerState로 바꾸는 결과를 초래한 것이다.
+
+바이퍼는 변경자를 모두 없애버렸다. 바이퍼의 권장사항은 다음과 같다. 만일 변경자를 검증만을 위해 사용했던 것이라면, 대신에 간단히 인라인 체크를 사용해서 함수의 일부분으로 포함해 검증하라. 그리고 스마트 컨트랙트의 상태를 변화시키기 위해 사용했던 것이라면, 이러한 변화를 명시적으로 함수의 일부분으로 만들어라. 이렇게 하면 감사 용의성과 가독성이 향상되는데, 왜냐하면 코드를 읽는 사람이 어떻게 작동하는지 보려고 머릿속으로 변경자 코드를 함수 주변에 '감싸'볼 필요가 없어지기 때문이다.
+
+이하 바이퍼 소개~~
+
+바이퍼 안쓸거라 일단 안봐도 될 듯.
