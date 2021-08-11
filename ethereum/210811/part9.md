@@ -369,3 +369,132 @@ contract FibonacciBalance {
 
 예를 들어, 라이브러리 컨트랙트를 살펴보겠다. start와 calculatedFibNumber라는 2개의 상태 변수를 갖고 있으며, 첫 번째 변수 start는 컨트랙트의 스토리지 slot[0]에 저장된다. 두 번째 변수 calculatedFibNumber는 다음으로 사용 가능한 스토리지 슬롯에 배치된다. 함수 setStart는 입력 값을 가져와서 start를 입력 값으로 설정한다. 따라서 이 함수는 slot[0]에 setStart 함수의 입력 값을 설정한다. 마찬가지로 setFibonacci 함수는 calculatedFibNumber를 fibonacci(n) 결과로 설정한다. 다시 말하면, 이것은 단순히 스토리지 slot[1]을 fibonacci(n) 값으로 설정하는 것이다.
 
+이제 FibonacciBalance 컨트랙트를 살펴보겠다. 이제 스토리지 slot[0]은 fibonacciLibrary 주소에 해당하고, slot[1]은 calculatedFibNumber에 해당한다. 이 잘못된 매핑에서 취약점이 발생한다. delegatecall은 컨트랙트 컨텍스트를 보존한다. 즉, delegatecall을 통해 실행되는 코드는 호출하는 컨트랙트의 상태에 따라 동작한다.
+
+이제 21행의 withdraw 함수에서 fibonacciLibrary.delegatecall(fibSig, withdrawalCounter)를 실행하는 것에 주목해 보자. 이것은 setFibonacci 함수를 호출하는데, 우리가 논의한 바와 같이 스토리지 slot[1]을 수정한다. 이 슬롯은 현재의 컨텍스트에서 calculatedFibNumber이다. 이것은 예상했던 대로다. 그러나 FibonacciLib 컨트랙트의 start 변수는 현재 컨트랙트의 fibonacciLibrary 주소인 스토리지 slot[0]에 있음을 기억하라. 이것은 fibonacci 함수가 예기치 않은 결과를 줄 수 있음을 의미한다. 이는 현재 호출 컨텍스트에서 fibonacciLibrary 주소인 start를 참고하기 때문이다. 따라서 calculatedFibNumber가 반환할 이더의 uint 양을 포함하지 않기 때문에 withdraw 함수가 원상태로 되돌아가게 된다.
+
+더 나쁜 것은, FibonacciBalance 컨트랙트는 사용자가 26행의 폴백 함수를 통해 모든 fibonacciLibrary 함수를 호출할 수 있도록 허용한다는 점이다. 이전에 논의했듯이, 여기에는 setStart 함수가 포함된다. 우리는 이 함수를 통해 누구나 스토리지 slot[0]을 수정하거나 설정할 수 있다고 설명했다. 이 경우 스토리지 slot[0]은 fibonacciLibrary 주소다. 따라서 공격자는 악의적인 컨트랙트를 만들고, 그 주소를 uint로 변환한 후에 setStart를 호출할 수 있게 된다. 이것은 fibonacciLibrary를 공격 컨트랙트의 주소로 변경한다. 그런 다음, 사용자가 withdraw나 폴백 함수를 호출할 때마다 fibonacciLibrary의 실제 주소를 변경했기 때문에 악의적인 컨트랙트가 실행된다. 이러한 공격 컨트랙트의 예는 다음과 같다.
+
+``` solidity
+contract Attack {
+    uint storageSlot0;
+    uint storageSlot1;
+
+    function() public {
+        storageSlot1 = 0;
+        <attacker_address>.transfer(this.balance);
+    }
+}
+```
+
+이 공격 컨트랙트는 스토리지 slot[1]을 변경함으로써 calculatedFibNumber를 변경한다. 원칙적으로 공격자는 자신이 선택한 다른 스토리지 슬롯을 수정하여 이 컨트랙트에 대해 모든 종류의 공격을 수행할 수 있다. 우리는 이런 컨트랙트를 리믹스에 넣고 delegatecall 함수를 통해 다양한 공격 컨트랙트와 상태 변경을 시도해 볼 것을 권장한다.
+
+우리가 delegatecall이 상태를 보존한다고 말할 때 그것은 컨트랙트의 변수 이름이 아니라 그 이름이 가리키는 실제 스토리지 슬롯에 대해 말하고 있음을 알아야 한다. 이 예에서 알 수 있듯이, 간단한 실수로 공격자가 전체 컨트랙트와 해당 이더를 가로챌 수 있다.
+
+### 예방 기법
+
+솔리디티는 라이브러리 컨트랙트를 구현하기 위한 키워드를 제공한다. 이것은 라이브러리 컨트랙트가 스테이트리스이며 비자기파괴적임을 보장한다. 라이브러리를 스테이트리스로 만들면 이 절에서 설명하는 스토리지 컨텍스트의 복잡성을 완화할 수 있다. 또한 스테이트리스 라이브러리는 공격자가 라이브러리의 코드를 기반으로 하는 컨트랙트에 영향을 주기 위해 직접 라이브러리의 상태를 수정하는 공격을 방지한다. 일반적으로 DELEGATECALL 라이브러리 컨트랙트와 호출 컨트랙트의 가능한 호출 컨텍스트에 세심하게 신경을 쓰고, 가능한 경우 스테이트리스 라이브러리를 만들어라.
+
+### 실제 사례: 패리티 멀티시그 지갑(두 번째 해킹)
+
+두 번째 패리티 멀티시그 지갑 해킹은 잘 작성된 라이브러리 코드가 의도된 컨텍스트 외부에서 실행될 경우 어떻게 악용될 수 있는지 보여주는 예다. '다시 해킹된 패리티 멀티 시그'와 '패리티 멀티시그 버그에 대해 깊이 살펴보기' 같은 여러가지 좋은 설명이 있다.
+
+이 참고에 추가하기 위해 악용된 컨트랙트를 살펴보겠다. 라이브러리와 지갑 컨트랙트는 깃허브에서 찾을 수 있다.
+
+라이브러리 컨트랙트는 다음과 같다.
+
+``` solidity
+contract WalletLibrary is WalletEvents {
+    modifier only_uninitialized {
+        if (m_numOwners > 0) throw; _;
+    }
+
+    function initWallet(address[] _owners, uint _required, uint _daylimit) only_uninitialized {
+        initDaylimit(_daylimit);
+        initMultiowned(_owners, _required);
+    }
+
+    function kill(address _to) onlymanyowners(sha3(msg.data)) external {
+        suicide(_to);
+    }
+}
+```
+
+다음은 지갑 컨트랙트다.
+
+``` solidity
+contract Wallet is WalletEvents {
+    function() payable {
+        if (msg.value > 0) {
+            Deposit(msg.sender, msg.value);
+        }
+        else if (msg.data.length > 0) {
+            _walletLibrary.delegatecall(msg.data);
+        }
+    }
+
+    address constant _walletLibrary = 0xcafecafecafe~~~;
+}
+```
+
+Wallet 컨트랙트는 기본적으로 delegate 호출을 통해 WalletLibrary 컨트랙트에 모든 호출을 전달한다. 이 코드의 상수 _walletLibrary 주소는 실제로 배포된 WalletLibrary 컨트랙트의 자리 표시자 역할을 한다.
+
+이러한 컨트랙트의 목적은 코드 라이브러리와 주요 기능이 WalletLibrary 컨트랙트에 포함된 간단하고 저렴하게 배포 가능한 Wallet 컨트랙트를 만들고자 한 것이었다. 유감스럽게도 WalletLibrary 컨트랙트는 자체가 컨트랙트이며, 그 자체의 상태를 유지한다. 왜 이것이 문제가 될지 이해할 수 있는가?
+
+WalletLibrary 컨트랙트 자체를 호출할 수 있다. 특히 WalletLibrary 컨트랙트를 초기화하고 소유할 수 있다. 실제로 사용자가 WalletLibrary 컨트랙트에서 initWallet 함수를 호출하고 라이브러리 컨트랙트의 소유자가 되었다. 이후 같은 사용자가 kill 함수를 호출했다. 사용자가 라이브러리 컨트랙트의 소유자였기 때문에 모디파이어가 전달되고 라이브러리 컨트랙트가 자기파괴되었다. 모든 Wallet 컨트랙트는 이 라이브러리 컨트랙트를 참고하며, 이 참고를 변경할 방법이 없으므로 WalletLibrary 컨트랙트와 함께 이더 출금 기능을 포함한 모든 기능이 사라져 버렸다. 결과적으로 이 유형의 모든 패리티 멀티시그 지갑의 모든 이더가 즉시 손실되거나 영구적으로 복구할 수 없게 된 것이었다.
+
+## 디폴트 가시성
+
+솔리디티의 함수에는 호출 방법을 지정하는 가시성 지정자가 있다. 가시성은 사용자가 함수를 외부에서 호출할 수 있는지, 다른 파생 컨트랙트가 함수를 내부에서만 또는 외부에서만 호출할 수 있는지 여부를 결정한다. 가시성 지정자는 네 가지가 있으며, 솔리디티 문서에 자세히 설명되어 있다. 함수는 기본적으로 public이며 사용자가 외부에서 호출할 수 있다. 지금부터 가시성 지정자의 잘못된 사용이 스마트 컨트랙트에서 어떤 치명적인 취약점을 초래하는지 알아볼 것이다.
+
+### 취약점
+
+함수에 대한 기본 가시성이 public이므로, 가시성을 지정하지 않은 함수는 외부 사용자가 호출할 수 있다. 개발자가 실수로 private 함수에 대한 가시성 지정자를 생략하면 문제가 발생한다.
+
+``` solidity
+contract HashForEther {
+    function withdrawWinnings() {
+        require(uint32(msg.sender) == 0);
+        _sendWinnings();
+    }
+
+    function _sendWinnings() {
+        msg.sender.transfer(this.balance);
+    }
+}
+```
+
+이 컨트랙트는 사용자가 마지막 8자리 16진수가 0인 이더리움 주소를 생성하면 withdrawWinnings 함수를 호출하여 현상금을 얻을 수 있다.
+
+그러나 불행히도 함수의 가시성은 지정되지 않았다. 특히 _sendWinnings 함수는 public이며, 따라서 어떤 주소에서든 이 함수를 호출하여 현상금을 훔칠 수 있다.
+
+### 예방 기법
+
+함수가 의도적으로 public이라고 할지라도 컨트랙트의 모든 함수에 대한 가시성을 항상 지정하는 것이 좋다. 최근 버전의 solc에서는 명시적인 이러한 방법을 권장하기 위해서 명시적으로 가시성 설정을 하지 않은 함수에는 경고를 표시한다.
+
+### 실제 사례 : 패리티 멀티시그 지갑(첫 번째 해킹)
+
+첫 번째 패리티 멀티시그 해킹에서 약 3,100만 달러 상당의 이더가 도난당했고, 대부분 3개의 지갑에서 발생했다. 이것이 어떻게 행해졌는지에 대한 정리는 하셉 쿠레시가 정리한 글을 참고하자.
+
+본질적으로, 멀티시그 지갑은 기본 지갑 컨트랙트로 구성된다. 이 컨트랙트는 핵심 기능 라이브러리 컨트랙트를 호출한다. 라이브러리 컨트랙트에는 다음 예시 코드에서 볼 수 있듯이 지갑을 초기화하는 코드가 들어있다.
+
+``` solidity
+contract WalletLibrary is WalletEvents {
+    function initMultiowned(address[] _owners, uint _required) {
+        m_numOwners = _owners.length + 1;
+        m_owners[1] = uint(msg.sender);
+        m_ownerIndex[uint(msg.sender)] = 1;
+        for (uint i = 0; i < _owners.length; ++i) {
+            m_owners[2 + i] = uint(_owners[i]);
+            m_ownerIndex[uint(_owners[i])] = 2 + i;
+        }
+        m_required = _required;
+    }
+
+    function initWallet(address[] _owners, uint _required, uint _daylimit) {
+        initDaylimit(_daylimit);
+        initMultiowned(_owners, _required);
+    }
+}
+```
+
