@@ -294,3 +294,78 @@ contract EtherGame {
 
 여기서 우리는 depositedEther라는 새로운 변수를 만들어 입금된 이더를 추적하고 테스트 하는 데 사용했다. 더 이상은 this.balance를 사용하지 않음을 유의하라.
 
+this.balance를 사용하지 않는 이유?
+maybe this.balance는 예측 불가능한 입금이 있을 경우가 있으므로, 따로 변수를 선언하여 값을 저장하지 않았을까 하는 생각이 든다.
+맞을듯?
+
+### DELEGATECALL
+
+CALL과 DELEGATECALL 연산코드는 이더리움 개발자가 코드를 모듈화할 수 있게 하는 데 유용하다. 컨트랙트에 대한 표준 외부 메시지 호출은 CALL 연산코드에 의해 처리되므로 코드가 외부 컨트랙트/함수의 컨텍스트에서 실행된다. 대상 주소에서 실행 코드가 호출 컨트랙트의 컨텍스트에서 실행되는 것을 제외하고 DELEGATECALL 연산코드는 거의 같으며, msg.sender와 msg.value는 변경되지 않는다. 이 특성을 사용하면 라이브러리를 구현할 수 있으므로 개발자는 재사용 가능한 코드를 일단 배포하고 향후 컨트랙트에서 호출할 수 있다.
+
+이 두 연산코드의 차이점은 간단하고 직관적이지만, DELEGATECALL을 사용하면 예기치 않은 코드가 실행될 수 있다.
+
+### 취약점
+
+DELEGATECALL의 컨텍스트 보존 특성으로 인해 취약점이 없는 사용자 지정 라이브러리를 구축하는 것은 생각만큼 쉽지 않다. 라이브러리 자체의 코드는 안전하고 취약점이 없을 수 있다. 그러나 다른 애플리케이션의 컨텍스트에서 실행될 때 새로운 취약점이 발생할 수 있다. 피보나치 수를 사용하여 이에 대한 상당히 복잡한 예를 살펴보겠다.
+
+``` solidity
+contract FibonacciLib {
+    uint public start;
+    uint public calculatedFibNumber;
+
+    function setStart(uint _start) public {
+        start = _start;
+    }
+
+    function setFibonacci(uint n) public {
+        calculatedFibNumber = fibonacci(n);
+    }
+
+    function fibonacci(uint n) internal returns (uint) {
+        if (n == 0) return start;
+        else if (n == 1) return start + 1;
+        else return fibonacci(n - 1) + fibonacci(n - 2);
+    }
+}
+```
+
+이 라이브러리는 수열에서 n번째 피보나치 수를 생성할 수 있는 함수를 제공한다. 사용자는 수열의 시작 번호를 변경하고, 이 새로운 수열에서 n번째 피보나치 같은 숫자를 계산할 수 있다.
+
+이제 이 라이브러리를 사용하는 컨트랙트를 아래 예제에서 살펴보자.
+
+``` solidity
+contract FibonacciBalance {
+    address public fibonacciLibrary;
+    uint public calculatedFibNumber;
+    uint public start = 3;
+    uint public withdrawalCounter;
+    bytes4 constant fibSig = bytes4(sha3("setFibonacci(uint256)"));
+
+    constructor(address _fibonacciLibrary) public payable {
+        fibonacciLibrary = _fibonacciLibrary;
+    }
+
+    function withdraw() {
+        withdrawalCounter += 1;
+        require(fibonacciLibrary.delegatecall(fibSig, withdrawalCounter));
+        msg.sender.transfer(calculatedFibNumber * 1 ether);
+    }
+
+    function() public {
+        require(fibonacciLibrary.delegatecall(msg.data));
+    }
+}
+```
+
+이 컨트랙트를 이용해서 참가자는 컨트랙트에서 이더를 출금할 수 있다. 여기서 출금되는 이더의 금액은 참가자의 출금 명령에 상응하는 피보나치 수와 같다. 즉, 첫 번째 참가자는 1이더를 얻고, 두 번째 참가자도 역시 1 이더를 얻고, 세 번째 참가자는 2 이더를 얻고, 네 번째는 3이더를 얻고, 다섯 번째는 5이더가 된다.
+
+이 컨트랙트에는 설명이 필요한 요소들이 있다. 첫 번째로, 흥미로운 변수인 fibSig가 있다. 이것은 'setFibonacci(uint256)' 문자열의 Keccak-256(SHA-3) 해시의 처음 4바이트를 보유한다. 이것은 함수 선택자로 알려져 있으며, 스마트 컨트랙트의 어떤 함수가 호출될지를 지정하기 위해서 calldata에 저장된다. 이것은 21행의 delegatecall 함수에서 fibonacci(uint256) 함수를 실행하고자 한다고 지정하는 데 사용된다. delegatecall의 두 번째 인수는 그 함수에 건네주는 파라미터다. 두 번째로, 우리는 FibonacciLib 라이브러리의 주소가 생성자에서 올바르게 참조되었다고 가정한다.
+
+이 컨트랙트에서 오류를 발견할 수 있는가? 컨트랙트를 배포하고 이더로 채우고 withdraw를 호출하면, 아마 다시 원상태로 되돌아갈 것이다.
+
+상태 변수 start가 라이브러리와 기본 호출 컨트랙트 모두에서 사용된다는 것을 알 수 있다. 라이브러리 컨트랙트에서 start는 피보나치 수열의 시작 부분을 지정하는 데 사용되고 0으로 설정되는 반면, 호출 컨트랙트에서는 3으로 설정된다. 또한 FibonacciBalance 컨트랙트의 폴백 함수로 모든 호출을 라이브러리 컨트랙트에 전달할 수 있으며, 라이브러리 컨트랙트의 setStart 함수를 호출할 수 있다는 것도 알 수 있다. 컨트랙트 상태를 보존한다는 점을 상기하면, 이 함수를 사용하면 지역 변수 FibonnacciBalance 컨트랙트 안에 있는 start 변수의 상태를 변경할 수 있다. 그렇다면 결과로 나온 calculatedFibNumber가 start 변수에 따라 달라지기 때문에 더 많은 이더를 출금할 수 있다. 실제로 setStart 함수는 FibonacciBalance 컨트랙트 안에 있는 start 변수를 수정하지 못한다. 이 컨트랙트의 근본적인 취약점은 start 변수를 수정하는 것보다 훨씬 심각하다.
+
+실제 문제를 논의하기 전에 상태 변수가 실제로 컨트랙트에 저장되는 방법을 살펴보겠다. 상태 또는 스토리지 변수는 컨트랙트에 도입될 때 순차적으로 슬롯에 배치된다.
+
+예를 들어, 라이브러리 컨트랙트를 살펴보겠다. start와 calculatedFibNumber라는 2개의 상태 변수를 갖고 있으며, 첫 번째 변수 start는 컨트랙트의 스토리지 slot[0]에 저장된다. 두 번째 변수 calculatedFibNumber는 다음으로 사용 가능한 스토리지 슬롯에 배치된다. 함수 setStart는 입력 값을 가져와서 start를 입력 값으로 설정한다. 따라서 이 함수는 slot[0]에 setStart 함수의 입력 값을 설정한다. 마찬가지로 setFibonacci 함수는 calculatedFibNumber를 fibonacci(n) 결과로 설정한다. 다시 말하면, 이것은 단순히 스토리지 slot[1]을 fibonacci(n) 값으로 설정하는 것이다.
+
