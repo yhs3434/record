@@ -219,6 +219,78 @@ contract EtherGame {
 
         require(currentBalance <= finalMileStone);
         
-        
+        if (currentBalance == payoutMileStone1) {
+            redeemableEther[msg.sender] += mileStone1Reward;
+        }
+        else if (currentBalance == payoutMileStone2) {
+            redeemableEther[msg.sender] += mileStone2Reward;
+        }
+        else if (currentBalance == finalMileStone) {
+            redeemableEther[msg.sender] += finalReward;
+        }
+    }
+
+    function claimReward() public {
+        require(this.balance == finalMileStone);
+
+        require(redeemableEther[msg.sender] > 0);
+        redeemableEther[msg.sender] = 0;
+        msg.sender.transfer(transferValue);
     }
 }
+```
+
+이 컨트랙트는 플레이어가 처음으로 세 가지 이정표 중 하나에 먼저 도달하기 위해 0.5이더를 컨트랙트에 보내는 간단한 게임을 나타낸다. 이정표는 이더로 표시된다. 이정표에 도달한 첫 번째 선수는 경기가 끝나면 이더의 일부를 요구할 수 있다. 마지막 이정표에 도달하면 게임이 종료된다. 사용자는 자신의 보상을 청구할 수 있다.
+
+EtherGame 컨트랙트의 문제는 14행, 32행에서 this.balance의 잘못된 사용으로 인한 것이다. 나쁜 공격자는 미래의 어떤 플레이어도 이정표에 도달하지 못하도록 selfdestruct 함수를 사용해 소량의 이더, 예를 들어 0.1이더를 강제로 보낼 수 있다. this.balance는 모든 합법적인 플레이어가 0.5개의 이더 증분만 보낼 수 있기 때문에, 0.1의 이더 기여로 인해 0.5의 배수가 되지는 않는다. 이렇게 하면 18, 21, 24행의 모든 if 조건이 참이 되지 않는다.
+
+더 나쁜 경우로, 이정표를 놓친 복수심에 불타는 공격자는 강제로 10이더를 보내면 컨트랙트의 모든 보상을 영원히 잠글 수 있다. 이것은 claimReward 함수가 32행의 require로 인해 항상 되돌리기 때문이다.
+
+### 예방 기법
+
+이러한 종류의 취약점은 일반적으로 this.balance의 공격으로 인해 발생한다. 컨트랙트 로직은 인위적으로 조작될 수 있기 때문에 가능하다면 컨트랙트 잔액의 정확한 값에 의존하지 않아야 한다. this.balance에 근거한 로직을 적용할 경우 예기치 않은 잔액에 대처해야 한다.
+
+만약 입금된 이더의 정확한 값이 필요하다면, 입금된 이더를 안전하게 추적할 수 있도록 입금 함수 내에서 증가하는 자체 정의된 변수를 사용해야 한다. 이 변수는 selfdestruct 호출을 통해 강제로 보내진 이더에 의해 영향을 받지 않는다.
+
+이를 염두에 두고 수정된 버전의 EtherGame 컨트랙트는 다음과 같다.
+
+``` solidity
+contract EtherGame {
+    uint public payoutMileStone1 = 3 ether;
+    uint public mileStone1Reward = 2 ether;
+    uint public payoutMileStone2 = 5 ether;
+    uint public mileStone2Reward = 3 ether;
+    uint public finalMileStone = 10 ether;
+    uint public finalReward = 5 ether;
+    uint public depositedWei;
+
+    mapping (address => uint) redeemableEther;
+
+    function play() public payable {
+        require(msg.value == 0.5 ether);
+        uint currentBalance = depositedWei + msg.value;
+        require(currentBalance <= finalMileStone);
+        if (currentBalance == payoutMileStone1) {
+            redeemableEther[msg.sender] += mileStone1Reward;
+        }
+        else if (currentBalance == payoutMileStone2) {
+            redeemableEther[msg.sender] += mileStone2Reward;
+        }
+        else if (currentBalance == finalMileStone) {
+            redeemableEther[msg.sender] += finalReward;
+        }
+        depositedWei += msg.value;
+        return;
+    }
+
+    function claimReward() public {
+        require(depositedWei == finalMileStone);
+        require(redeemableEther[msg.sender] > 0);
+        redeemableEther[msg.sender] = 0;
+        msg.sender.transfer(transferValue);
+    }
+}
+```
+
+여기서 우리는 depositedEther라는 새로운 변수를 만들어 입금된 이더를 추적하고 테스트 하는 데 사용했다. 더 이상은 this.balance를 사용하지 않음을 유의하라.
+
