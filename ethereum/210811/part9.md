@@ -190,3 +190,35 @@ contract TimeLock {
 올바른 상태 전이 또는 유효성 검사를 강제하는 데 유용한 일반적인 방어 프로그래밍 기법은 불변 검사다. 이 기법은 하나의 연산 후에 변경되지 않는 불변량을 정의하고 변경되지 않았는지 확인하는 것이다. 검사하는 불변량이 실제로 불변량이라면 이것은 일반적으로 좋은 설계다. 불변량의 한 예는 고정 발행되는 ERC20 토큰의 totalSupply이다. 이 불변부를 수정해야 하는 함수가 없기 때문에 함수가 예상대로 작동하는지 확인하기 위해 totalSupply를 수정하지 않은 상태로 유지하도록 transfer 함수에 체크를 추가할 수 있다.
 
 특히, 불변량으로 사용하고 싶을 정도로 불변량처럼 보이지만, 사실은 외부 사용자들에 의해 조작될 수 있는 것이 있다. 이것은 컨트랙트에 저장된 현재 이더양이다. 종종 개발자가 솔리디티를 배울 때 컨트랙트가 payable 함수를 통해서만 이더를 받아들이거나 얻을 수 있다고 오해를 한다. 이러한 오해로 인해 내부의 이더 잔액에 대한 잘못된 가정을 하는 컨트랙트가 생길 수 있으며, 이로 인해 다양한 취약점이 발생할 수 있다. 이 취약점에 대한 명백한 증거는 this.balance의 사용법이다.
+
+이더가 payable 함수를 사용하거나 컨트랙트에서 코드를 실행하지 않고 컨트랙트에 보내질 수 있는 두 가지 방법이 있다.
+
+- 자기파괴
+
+    모든 컨트랙트는 selfdestruct 함수를 구현할 수 있다. 이 함수는 컨트랙트 주소에서 모든 바이트 코드를 제거하고 거기에 저장된 모든 이더를 파라미터로 지정된 주소로 보낸다. 이 지정된 주소가 컨트랙트인 경우에 어떤 함수도 호출되지 않는다. 이 지정된 주소가 컨트랙트인 경우에 어떤 함수도 호출되지 않는다. 따라서 이 selfdestruct 함수는 컨트랙트에 존재할 수 있는 코드와 관계없이 이더를 강제로 임의의 컨트랙트로 보낼 수 있다. 이것은 아무 공격자나 selfdestruct 함수를 가진 컨트랙트를 만들고, 여기에 이더를 보낸 다음, selfdestruct(target)을 호출해서 target 컨트랙트에 강제로 이더를 보낼 수 있음을 의미한다. 마틴 스웬데는 이에 대한 상세한 블로그 게시물을 작성했다. 거기서 클라이언트 노드가 잘못된 불변량을 검사하는 방법에 대한 설명과 함께 자기파괴 연산코드의 몇 가지 단점을 설명한다. 그리고 그것은 상당히 치명적인 이더리움 네트워크의 붕괴를 가져올 수도 있었다.
+
+- 미리 보내진 이더
+
+    컨트랙트 주소를 미리 알 수 있기 때문에 미리 계산된 주소로 이더를 보낼 수 있다. 컨트랙트 주소는 결정론적이다. 실제로 주소는 컨트랙트를 생성하는 주소와 컨트랙트를 생성하는 트랜잭션 논스의 Keccak-256 해시로 계산된다. 아드리안 매닝의 '키 없는 이더'에 대한 재미있는 사용 사례를 참고하라. 이것은 누구나 컨트랙트가 생성되기 전에 컨트랙트의 주소를 계산할 수 있고, 이 주소로 이더를 보낼 수 있음을 의미한다. 이 컨트랙트가 실제로 생성되었을 때 이것은 0이 아닌 이더 밸런스를 갖게 된다.
+
+이런 사실을 바탕으로 발생할 수 있는 몇 가지 위험을 예제 9-5를 통해 살펴보자.
+
+``` solidity
+contract EtherGame {
+    uint public payoutMileStone1 = 3 ether;
+    uint public mileStone1Reward = 2 ether;
+    uint public payoutMileStone2 = 5 ether;
+    uint public mileStone2Reward = 3 ether;
+    uint public finalMileStone = 10 ether;
+    uint public finalReward = 5 ether;
+
+    mapping(address => uint) redeemableEther;
+    function play() public payable {
+        require(msg.value == 0.5 ether);
+        uint currentBalance = this.balance + msg.value;
+
+        require(currentBalance <= finalMileStone);
+        
+        
+    }
+}
