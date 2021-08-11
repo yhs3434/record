@@ -648,3 +648,98 @@ contract Print {
 ```
 
 이러한 컨트랙트 중 하나의 주소가 생성자에서 제공되면, 이 encryptPrivateData 함수는 단순히 암호화되지 않은 개인 데이터를 인쇄하는 이벤트를 생성한다.
+
+이 예제에서는 생성자에서 라이브러리 같은 컨트랙트가 설정되었지만, 권한 있는 사용자가 라이브러리 컨트랙트 주소를 변경할 수 있는 경우가 종종 있다. 연결된 컨트랙트에 호출 중인 함수가 포함되어 있지 않으면 폴백 함수가 실행된다. 예를 들어, encryptionLibrary.rot13Encrypt()에서 만약 encryptionLibrary 컨트랙트가 다음과 같다면,
+
+``` solidity
+contract Blank {
+    event Print(string text);
+    function () {
+        emit Print("Here");
+    }
+}
+```
+
+그러면 텍스트 Here가 있는 이벤트가 실행된다. 따라서 사용자가 컨트랙트 라이브러리를 변경할 수 있다면, 원칙적으로 다른 사용자가 모르는 사이에 임의의 코드를 실행할 수 있다.
+
+### 예방 기법
+
+앞에서 설명한 것처럼 안전한 컨트랙트도 악의적으로 작동하도록 배포될 수 있다. 어떤 감시자가 공개적으로 컨트랙트를 검증하고, 그 컨트랙트의 소유자로 하여금 악의적인 방법으로 컨트랙트를 배포하도록 할 수 있다. 그로 인해 공개적으로 감사된 컨트랙트가 취약점이나 악의적인 의도를 갖게 만들 수 있는 것이다.
+
+이러한 시나리오를 방지하는 데는 여러 가지 기술이 있다.
+
+한 가지 방법은 new 키워드를 사용하여 컨트랙트를 작성하는 것이다. 앞의 예제에서 생성자는 다음과 같이 작성할 수 있다.
+
+``` solidity
+constructor () {
+    encryptionLibrary = new Rot13Encryption();
+}
+```
+
+이렇게 하면 참고된 컨트랙트의 인스턴스가 배포 시 생성되고, 배포자는 Rot13Encryption 컨트랙트를 변경하지 않고 컨트랙트를 대체할 수 없다.
+
+또 다른 해결책은 외부 컨트랙트 주소를 하드코딩하는 것이다.
+
+일반적으로 외부 컨트랙트를 호출하는 코드는 항상 주의 깊게 감사해야 한다. 개발자로서 외부 컨트랙트를 정의할 때 컨트랙트에 언급된 코드를 사용자가 쉽게 검사할 수 있도록 컨트랙트 주소를 public으로 설정하는 것이 좋다. 반대로, 컨트랙트에 private 변수 컨트랙트 주소가 있는 경우 누군가 악의적으로 행동하는 사람이 있다는 신호가 될 수 있다. 사용자가 외부 함수를 호출하는 데 사용되는 컨트랙트 주소를 변경할 수 있는 경우, 사용자가 변경되는 코드를 볼 수 있도록 시간 잠금 및 또는 투표 메커니즘을 구현하는 것이 중요할 수 있으며, 참가자들에게 새로운 컨트랙트 주소로 옵트인/아웃할 수 있는 기회를 제공한다.
+
+### 실제 사례 : 허니 팟에 재진입
+
+많은 수의 최신 허니팟이 메인넷에서 출시되었다. 이 컨트랙트는 컨트랙트를 악용하려고 하는 이더리움 해커를 이겨보려고 시도하는데, 결국 해커들은 그들이 악용하려고 하는 컨트랙트에 이더를 잃게 된다. 다음은 생성자에서 정상 컨트랙트를 악의적인 컨트랙트로 바꿔치기를 해서 공격하고자 하는 예다.
+
+``` solidity
+pragma solidity ^0.4.19;
+
+contract Private_Bank {
+    mapping (address => uint) public balances;
+    uint public MinDeposit = 1 ether;
+    Log TransferLog;
+
+    function Private_Bank(address _log) {
+        TransferLog = Log(_log);
+    }
+
+    function Deposit() public payable {
+        if (msg.value >= MinDeposit) {
+            balances[msg.sender] += msg.value;
+            TransferLog.AddMessage(msg.sender, msg.value, "Deposit");
+        }
+    }
+
+    function CashOut(uint _am) {
+        if (_am <= balances[msg.sender]) {
+            if (msg.sender.call.value(_am)()) {
+                balances[msg.sender] -= _am;
+                TransferLog.AddMessage(msg.sender, _am, "CashOut");
+            }
+        }
+    }
+
+    function() public payable {}
+}
+
+contract Log {
+    struct Message {
+        address Sender;
+        string Data;
+        uint Val;
+        uint Time;
+    }
+
+    Message[] public History;
+    Message LastMsg;
+
+    function AddMessage(address _adr, uint _val, string _data) public {
+        LastMsg.Sender = _adr;
+        LastMsg.Time = now;
+        LastMsg.Val = _val;
+        LastMsg.Data = _data;
+        History.push(LastMsg);
+    }
+}
+```
+
+한 레딧 사용자가 포스팅한 이 게시물은 그들이 컨트랙트에 있을 것으로 예상한 재진입 버그를 악용하려다 어떻게 1이더를 잃게 되었는지를 설명하고 있다.
+
+## 짧은 주소 / 파라미터 공격
+
+이 공격은 솔리디티 컨트랙트 자체에서는 수행되지 않지만, 이 컨트랙트와 상호작용하는 제3자의 애플리케이션에서는 일어날 수 있다. 
