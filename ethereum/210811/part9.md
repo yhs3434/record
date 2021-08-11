@@ -498,3 +498,153 @@ contract WalletLibrary is WalletEvents {
 }
 ```
 
+두 함수 모두 가시성을 지정하지 않았기 때문에 둘 다 기본값인 public으로 설정된다. 이 initWallet 함수는 지갑의 생성자에서 호출되며, initMultiowned 함수에서 볼 수 있는 것처럼 멀티시그 지갑의 소유자를 설정한다. 이러한 public 함수가 실수로 남아 있었기 때문에, 공격자는 배포된 컨트랙트에서 이러한 기능을 호출하여 소유권을 공격자의 주소로 재설정할 수 있었다. 공격자는 소유자가 되어 지갑에서 모든 이더를 가져갈 수 있었다.
+
+## 엔트로피 환상
+
+이더리움 블록체인의 모든 트랜잭션은 결정론적 상태 전이 연산이다. 이것은 모든 트랜잭션이 이더리움 생태계의 전체 상태를 불확실성 없이 계산 가능한 방식으로 변경한다는 것을 의미한다. 이것은 이더리움에서 엔트로피 또는 무작위성의 근원이 없다는 근본적인 함축성을 지니고 있다. 탈중앙화된 엔트로피를 달성하기 위해 란다오를 포함해 많은 솔루션이 제안되었으며, 블로그 게시물 '지분증명에서 검증자의 순서 및 무작위성'에서 비탈릭 부테린이 설명한 것처럼 해시들의 체인을 사용한 방법도 있다.
+
+### 취약점
+
+이더리움 플랫폼을 기반으로 구축된 최초의 컨트랙트 중 일부는 도박을 기반으로 했다. 근본적으로 도박에는 불확실성이 필요하기 때문에 블록체인에 도박 시스템을 구축하는 것은 다소 어렵다. 불확실성은 블록체인 외부의 소스에서 나와야만 한다는 점은 분명하다. 이것은 플레이어들 간의 배팅에는 가능하지만, 블랙잭이나 룰렛처럼 하우스 게임 형태의 컨트랙트를 구현하는 것은 상당히 더 어렵다. 일반적인 함정은 미래의 블록 변수, 즉 해시, 타임스탬프, 블록 번호 또는 가스 한도 같은, 값이 아직 알려지지 않은 트랜잭션 블록에 대한 정보를 포함하는 변수를 사용하는 것이다. 그러나 블록은 이를 채굴하는 채굴자가 통제하고 있으며, 그렇기 때문에 궁극적인 무작위 값이 될 수 없다는 점에 문제가 있다. 예를 들어, 다음 블록 해시가 짝수로 끝나면 검은색 숫자를 반환하는 로직을 가진 룰렛 스마트 컨트랙트를 생각해 보자. 채굴자는 검은색으로 100만 달러를 걸 수 있다. 그들이 다음 블록을 풀어서 해시가 홀수로 끝나는 것을 발견하면, 그들은 당연히 그 블록을 게시하지 않고 블록 해시가 짝수인 솔루션을 찾을 때까지 블록을 채굴할 것이다. 마틴 스웬데가 자신의 훌륭한 블로그 게시물에서 보여준 것처럼 과거 또는 현재 변수를 사용하는 것은 훨씬 더 위험할 수 있다. 또한 블록 변수가 사용하면 하나의 블록 안에 있는 모든 트랜잭션에 대해 의사 난수가 같으므로, 공격자는 해당 블록 내에서 많은 트랜잭션을 수행하여 승률을 높일 수 있다.
+
+### 예방 기법
+
+엔트로피의 원천은 블록체인 외부에 있어야 한다. 이는 커밋-공개 같은 시스템을 사용하는 피어 또는 란다오에서와 같이 참가자 그룹에 대한 신뢰 모델 변경을 통해 수행될 수 있다. 이는 임의성 오라클 역할을 하는 중앙화된 엔터티를 통해 수행될 수도 있다. 블록 변수는 채굴자가 조작할 수 있으므로 엔트로피의 원천으로 사용하면 안 된다.
+
+### 실제 사례 : PRNG 컨트랙트
+
+2018년 2월 아스니 루토브는 일종의 의사 난수 생성기를 사용하는 3,649개의 스마트 컨트랙트에 대한 분석을 블로그에 올렸다. 그는 악용할 수 있는 43건의 컨트랙트를 발견했다.
+
+### 외부 컨트랙트 참고
+
+이더리움 '월드 컴퓨터'의 이점 중 하나는 코드를 재사용하고 네트워크에 이미 배포된 컨트랙트와 상호작용 하는 능력이다. 결과적으로 많은 수의 컨트랙트가 대개 외부 메시지 호출을 통해 외부 컨트랙트를 참고한다. 이러한 외부 메시지 호출은 악의적인 행위자의 의도를 몇 가지 모호한 방법으로 숨길 수 있다.
+
+### 취약점
+
+솔리디티에서는 어떤 주소이든지 컨트랙트로 캐스트할 수 있는데, 해당 주소에 있는 코드가 실제 컨트랙트를 표현하고 있는지 여부와는 상관없다. 이로 인해 특히 컨트랙트 작성자가 악성 코드를 숨기려고 할 때 문제가 발생할 수 있다.
+
+ROT13 암호를 우연히 구현한 코드를 생각해보자.
+
+``` solidity
+contract Rot13Encryption {
+    event Result(string convertedString);
+
+    function rot13Encrypt (string text) public {
+        uint256 length = bytes(text).length;
+        for (var i = 0; i < length; i++) {
+            byte char = bytes(text)[i];
+            assembly {
+                char := byte(0, char)
+                if and(gt(char, 0x6D), lt(char, 0x7B))
+                {
+                    char := sub(0x60, sub(0x7A, char))
+                }
+                if iszero(eq(char, 0x20))
+                {
+                    mstore8(add(add(text, 0x20), mul(i, 1)), add(char, 13))
+                }
+            }
+        }
+        emit Result(text);
+    }
+
+    function rot13Decrypt (string text) public {
+        uint256 length = bytes(text).length;
+        for (var i = 0; i < length; i++) {
+            byte char = bytes(text)[i];
+            assembly {
+                char := byte(0, char)
+                if and(gt(char, 0x60), lt(char, 0x6E))
+                {
+                    char := add(0x7B, sub(char, 0x61))
+                }
+                if iszero(eq(char, 0x20))
+                {
+                    mstore8(add(add(text, 0x20), mul(i, 1)), sub(char, 13))
+                }
+            }
+        }
+        emit Result(text);
+    }
+}
+```
+
+이 코드는 문자열을 가져와서 각 문자를 오른쪽으로 13칸 이동하여 암호화한다. 즉, a는 n이 되고 x는 k가 된다. 위 컨트랙트의 어셈블리는 논의되는 문제를 위해 이해할 필요가 없으므로 어셈블리에 익숙하지 않은 독자는 이를 무시해도 좋다.
+
+이제 암호화를 위해 이 코드를 사용하는 다음 컨트랙트를 살펴보자.
+
+``` solidity
+import "Rot13Encryption.sol";
+
+contract EncryptionContract {
+    Rot13Encryption encryptionLibrary;
+
+    constructor (Rot13Encryption _encryptionLibrary) {
+        encryptionLibrary = _encryptionLibrary;
+    }
+
+    function encryptPrivateDate(string privateInfo) {
+        encryptionLibrary.rot13Encrypt(privateInfo);
+    }
+}
+```
+
+ 이 컨트랙트의 문제점은 encryptionLibrary 주소가 공개형이거나 상수가 아니라는 것이다. 따라서 컨트랙트 배포자는 생성자에서 이 컨트랙트를 가리키는 주소를 제공할 수 있다.
+
+``` solidity
+contract Rot26Encryption {
+    event Result(string convertedString);
+
+    function rot13Encrypt (string text) public {
+        uint256 length = bytes(text).length;
+            for (var i = 0; i < length; i++) {
+            byte char = bytes(text)[i];
+            assembly {
+                char := byte(0, char)
+                if and(gt(char, 0x6D), lt(char, 0x7B))
+                {
+                    char := sub(0x60, sub(0x7A, char))
+                }
+                if iszero(eq(char, 0x20))
+                {
+                    mstore8(add(add(text, 0x20), mul(i, 1)), add(char, 26))
+                }
+            }
+        }
+        emit Result(text);
+    }
+
+    function rot13Decrypt (string text) public {
+        uint256 length = bytes(text).length;
+        for (var i = 0; i < length; i++) {
+            byte char = bytes(text)[i];
+            assembly {
+                char := byte(0, char)
+                if and(gt(char, 0x60), lt(char, 0x6E))
+                {
+                    char := add(0x7B, sub(char, 0x61))
+                }
+                if iszero(eq(char, 0x20)) {
+                    mstore8(add(add(text, 0x20), mul(i, 1)), sub(char, 26))
+                }
+            }
+        }
+        emit Result(text);
+    }
+}
+```
+
+이 컨트랙트는 각 문자를 26자리만큼 이동시키는 ROT26 암호를 구현한다. 다시 말하지만, 이 컨트랙트에서 어셈블리를 이해할 필요는 없다. 더 간단히 말해서, 공격자는 다음 컨트랙트를 동일한 효과에 연결할 수 있다.
+
+``` solidity
+contract Print {
+    event Print(string text);
+
+    function rot13Encrypt(string text) public {
+        emit Print(text);
+    }
+}
+```
+
+이러한 컨트랙트 중 하나의 주소가 생성자에서 제공되면, 이 encryptPrivateData 함수는 단순히 암호화되지 않은 개인 데이터를 인쇄하는 이벤트를 생성한다.
