@@ -271,3 +271,5 @@ contract NameRegistrar {
 이 취약점에 대해 논의하려면 우선 솔리디티에서 스토리지가 어떻게 작동하는지 이해해야 한다. 개략적으로 상태 변수는 컨트랙트에서 나타나는 대로 슬롯에 순차적으로 저장된다. 따라서 slot[0]에 unlocked, slot[1]에 registeredNameRecord, slot[2]에 resolve 등이 존재한다. 각 슬롯의 크기는 32바이트다. 부울 unlocked는 false의 0x0000...0 또는 true 의 0x000...1처럼 보인다. 보다시피 이 특별한 예에서는 상당한 스토리지 낭비가 있다.
 
 다음 퍼즐 조각은 기본적으로 솔리디티가 struct 같은 복잡한 데이터 타입을 지역 변수로 초기화할 때 스토리지에 저장한다는 것이다. 따라서 18행의 newRecord는 기본적으로 스토리지에 저장된다. 취약점은 newRecord가 초기화되지 않았기 때문에 발생한다. 왜냐하면 newRecord는 기본값이 스토리지이고 그것은 스토리지 slot[0]에 매핑되기 때문이다. 19행과 20행에서 newRecord.name을 _name으로 설정하고 newRecord.mappedAddress를 _mappedAddress로 설정한다. 이것은 slot[0] 및 slot[1]의 저장 위치를 갱신하며, 이는 unlocked와 registeredNameRecord 관련 저장 슬롯을 모두 수정한다.
+
+이는 unlocked는 register 함수의 bytes32 _name 파라미터에 의해 직접 수정될 수 있음을 의미한다. 따라서 _name의 마지막 
