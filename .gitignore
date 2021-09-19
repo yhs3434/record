@@ -112,3 +112,6 @@ temp/
 
 # firebase
 firebase.json
+
+# memory list
+memory_list.md
